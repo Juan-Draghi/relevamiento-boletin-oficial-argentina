@@ -34,5 +34,5 @@ Este proyecto está disponible bajo la [Licencia MIT](LICENSE).
 Se permite su uso, copia, modificación y redistribución con o sin fines comerciales, siempre que se mantenga la atribución correspondiente.
 
 
-**Autor:** Juan Draghi — Biblioteca del Consejo Profesional de Arquitectura y Urbanismo  
-**Contacto:** juan.draghi@gmail.com
+## Autor:
+Juan Draghi — Biblioteca del Consejo Profesional de Arquitectura y Urbanismo (con la asistencia de ChatGPT)
