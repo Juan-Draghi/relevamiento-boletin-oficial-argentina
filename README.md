@@ -10,7 +10,7 @@ Facilitar la detección de disposiciones, resoluciones, leyes, decretos y otra n
 
 - Lectura de texto desde archivos PDF del Boletín Oficial.
 - Búsqueda de términos exactos y expresiones regulares.
-- Posibilidad de definir palabras clave desde una lista o un archivo Excel.
+- Posibilidad de definir palabras clave desde una lista.
 - Exportación de resultados a un archivo `.xlsx` con los términos encontrados y su contexto.
 - Interfaz ejecutable desde Google Colab, sin necesidad de instalación local.
 
