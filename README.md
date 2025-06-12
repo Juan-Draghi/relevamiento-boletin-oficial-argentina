@@ -14,19 +14,11 @@ Facilitar la detección de disposiciones, resoluciones, leyes, decretos y otra n
 - Exportación de resultados a un archivo `.xlsx` con los términos encontrados y su contexto.
 - Interfaz ejecutable desde Google Colab, sin necesidad de instalación local.
 
-## Requisitos
-
-- Cuenta de Google para utilizar Google Colab.
-- Archivo PDF del Boletín Oficial descargado localmente.
-- (Opcional) Archivo `.xlsx` con palabras clave personalizadas.
-
 ## Instrucciones de uso
 
-1. Abrir el notebook en Google Colab.
-2. Subir el archivo PDF del Boletín del día.
-3. Subir el archivo de términos clave (o editar la lista manualmente en el código).
-4. Ejecutar las celdas del notebook.
-5. Descargar el archivo de resultados (`resultados_busqueda_BORA.xlsx`).
+1. Ejecutar las celdas del notebook.
+2. Descargar el archivo de resultados (`resultados_busqueda_BORA.xlsx`).
+3. Para actualizar el listado de palabras clave, modificar las lista keywords.
 
 ## Licencia
 
