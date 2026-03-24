@@ -1,30 +1,83 @@
-# Relevamiento diario del Boletín Oficial de la República Argentina
+# Relevamiento del Boletin Oficial de la Republica Argentina
 
-Este repositorio contiene un script desarrollado en Python (Google Colab) para automatizar la búsqueda diaria de normativa vinculada al ejercicio profesional de la arquitectura en los ejemplares del Boletín Oficial de la República Argentina.
+[![Licencia MIT](https://img.shields.io/badge/licencia-MIT-green.svg)](LICENSE)
+[![Abrir en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Juan-Draghi/relevamiento-boletin-oficial-argentina/blob/main/Busqueda_Boletin_Oficial_RA_v3.ipynb)
+[![Hugging Face Space](https://img.shields.io/badge/Hugging%20Face-Space-yellow)](https://huggingface.co/spaces/J-Draghi/relevamiento_bora)
+[![Repositorio GitHub](https://img.shields.io/badge/GitHub-Repositorio-black)](https://github.com/Juan-Draghi/relevamiento-boletin-oficial-argentina)
 
-## Objetivo
+Herramienta para relevar normativa publicada en el Boletin Oficial de la Republica Argentina mediante busquedas por palabras clave y patrones dentro de documentos PDF.
 
-Facilitar la detección de disposiciones, resoluciones, leyes, decretos y otra normativa urbanística o edilicia mediante la búsqueda automatizada de términos clave y expresiones regulares en el PDF diario del Boletín.
+Este repositorio conserva el origen y la evolucion del proyecto:
 
-## Características
+1. Prototipo inicial desarrollado en Google Colab.
+2. Adaptacion posterior como aplicacion web.
+3. Despliegue publico en Hugging Face Spaces.
 
-- Lectura de texto desde archivos PDF del Boletín Oficial.
-- Búsqueda de términos exactos y expresiones regulares.
-- Posibilidad de definir palabras clave desde una lista.
-- Exportación de resultados a un archivo `.xlsx` con los términos encontrados y su contexto.
-- Interfaz ejecutable desde Google Colab, sin necesidad de instalación local.
+## Acceso rapido
 
-## Instrucciones de uso
+- App web: [Relevamiento Bora en Hugging Face Spaces](https://huggingface.co/spaces/J-Draghi/relevamiento_bora)
+- Repositorio: [Juan-Draghi/relevamiento-boletin-oficial-argentina](https://github.com/Juan-Draghi/relevamiento-boletin-oficial-argentina)
+- Notebook original: [Busqueda_Boletin_Oficial_RA_v3.ipynb](https://github.com/Juan-Draghi/relevamiento-boletin-oficial-argentina/blob/main/Busqueda_Boletin_Oficial_RA_v3.ipynb)
+- Abrir en Colab: [Google Colab](https://colab.research.google.com/github/Juan-Draghi/relevamiento-boletin-oficial-argentina/blob/main/Busqueda_Boletin_Oficial_RA_v3.ipynb)
 
-1. Ejecutar las celdas del notebook.
-2. Descargar el archivo de resultados (`resultados_busqueda_BORA.xlsx`).
-3. Para actualizar el listado de palabras clave, modificar las lista keywords.
+## Vista previa
+
+[![Vista previa del Space](docs/space-preview.png)](https://huggingface.co/spaces/J-Draghi/relevamiento_bora)
+
+## Que hace la herramienta
+
+- Lee ejemplares del Boletin Oficial en PDF.
+- Busca terminos exactos y expresiones regulares.
+- Detecta menciones relevantes dentro del texto.
+- Facilita la revision de normativa de interes profesional.
+- Permite exportar resultados para su analisis posterior.
+
+## Evolucion del proyecto
+
+La primera version fue desarrollada como notebook en Google Colab para experimentar rapido con el procesamiento de PDFs, ajustar palabras clave y exportar resultados sin requerir instalacion local.
+
+Mas adelante, ese prototipo se transformo en una aplicacion web para simplificar el acceso desde navegador y hacer la herramienta mas util para usuarios no tecnicos. La version publicada se encuentra en Hugging Face Spaces.
+
+Frase breve sugerida para describir el proyecto en GitHub:
+
+> Prototipo original en Google Colab, posteriormente adaptado como aplicacion web y desplegado en Hugging Face Spaces.
+
+## Como usar
+
+### Opcion 1: usar la app web
+
+1. Abrir el Space en Hugging Face.
+2. Ingresar la URL de un PDF del Boletin Oficial o cargar un archivo PDF.
+3. Ejecutar la busqueda.
+4. Revisar los resultados obtenidos.
+
+### Opcion 2: usar el notebook original
+
+1. Abrir `Busqueda_Boletin_Oficial_RA_v3.ipynb`.
+2. Ejecutar las celdas en Google Colab o en Jupyter.
+3. Ajustar las palabras clave si hace falta.
+4. Exportar y revisar los resultados.
+
+## Contenido del repositorio
+
+- `Busqueda_Boletin_Oficial_RA_v3.ipynb`: prototipo original desarrollado en Google Colab.
+- `docs/space-preview.png`: imagen de vista previa usada en la portada del repositorio.
+- `README.md`: documentacion general del proyecto.
+- `LICENSE`: licencia del repositorio.
+
+## Tecnologias y despliegue
+
+- Prototipo inicial: Google Colab / Jupyter Notebook
+- Version web publicada: Hugging Face Spaces
+- Interfaz del Space: Gradio
+- Lenguaje principal: Python
 
 ## Licencia
 
-Este proyecto está disponible bajo la [Licencia MIT](LICENSE).  
-Se permite su uso, copia, modificación y redistribución con o sin fines comerciales, siempre que se mantenga la atribución correspondiente.
+Este proyecto se distribuye bajo la [Licencia MIT](LICENSE).
 
+## Autor
 
-## Autor:
-Juan Draghi — Biblioteca del Consejo Profesional de Arquitectura y Urbanismo (con la asistencia de ChatGPT)
+Juan Draghi  
+Biblioteca del Consejo Profesional de Arquitectura y Urbanismo  
+Con asistencia de ChatGPT
