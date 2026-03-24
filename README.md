@@ -56,43 +56,6 @@ Frase breve sugerida para describir el proyecto en GitHub:
 3. Ajustar las palabras clave si hace falta.
 4. Exportar y revisar los resultados.
 
-## Estructura sugerida del repositorio
-
-```text
-.
-|-- docs/
-|   `-- space-preview.png
-|-- notebooks/
-|   `-- Busqueda_Boletin_Oficial_RA_v3.ipynb
-|-- webapp/
-|   `-- README.md
-|-- LICENSE
-`-- README.md
-```
-
-## Donde guardar el codigo de la web app
-
-El notebook y la app web ya no deberian tratarse como el mismo artefacto.
-
-- `notebooks/` guarda el prototipo original de Google Colab.
-- `webapp/` debe guardar el codigo fuente de la aplicacion web.
-
-Si mas adelante incorporas el codigo del Space a este repo, lo correcto es poner en `webapp/` archivos como:
-
-- `app.py`
-- `requirements.txt`
-- modulos auxiliares de Python
-- assets o archivos de configuracion propios de la app
-
-Nota importante: para desplegar directamente en Hugging Face Spaces, el repo del Space suele necesitar `app.py` y `requirements.txt` en la raiz de ese repositorio. Por eso, si este repo es tu repositorio general de proyecto, `webapp/` sirve como codigo fuente organizado, pero el repo del Space puede seguir siendo separado o requerir sincronizacion.
-
-## Contenido del repositorio
-
-- `docs/space-preview.png`: imagen de vista previa usada en la portada del repositorio.
-- `notebooks/Busqueda_Boletin_Oficial_RA_v3.ipynb`: prototipo original desarrollado en Google Colab.
-- `webapp/README.md`: ubicacion prevista para documentar y guardar el codigo de la aplicacion web.
-- `README.md`: documentacion general del proyecto.
-- `LICENSE`: licencia del repositorio.
 
 ## Tecnologias y despliegue
 
