@@ -20,9 +20,6 @@ Este repositorio conserva el origen y la evolucion del proyecto:
 - Notebook original: [Busqueda_Boletin_Oficial_RA_v3.ipynb](https://github.com/Juan-Draghi/relevamiento-boletin-oficial-argentina/blob/main/Busqueda_Boletin_Oficial_RA_v3.ipynb)
 - Abrir en Colab: [Google Colab](https://colab.research.google.com/github/Juan-Draghi/relevamiento-boletin-oficial-argentina/blob/main/Busqueda_Boletin_Oficial_RA_v3.ipynb)
 
-## Vista previa
-
-[![Vista previa del Space](docs/space-preview.png)](https://huggingface.co/spaces/J-Draghi/relevamiento_bora)
 
 ## Que hace la herramienta
 
