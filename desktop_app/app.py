@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+import os
 import sys
 import threading
 import webbrowser
@@ -14,9 +15,32 @@ if str(PROJECT_ROOT) not in sys.path:
 from desktop_app.search_core import DEFAULT_URL, SearchError, get_pdf_content, load_keywords, search_pdf_content
 
 
-KEYWORDS_FILE = Path(__file__).with_name("keywords.json")
+def get_bundle_root() -> Path:
+    if getattr(sys, "frozen", False):
+        return Path(getattr(sys, "_MEIPASS"))
+    return Path(__file__).resolve().parent
 
-app = Flask(__name__)
+
+def get_user_data_dir() -> Path:
+    appdata = os.getenv("LOCALAPPDATA") or os.getenv("APPDATA")
+    if appdata:
+        return Path(appdata) / "BibliotecaCPAU" / "RelevamientoBORA"
+    return Path.home() / ".biblioteca-cpau" / "relevamiento-bora"
+
+
+def get_keywords_file() -> Path:
+    if getattr(sys, "frozen", False):
+        return get_user_data_dir() / "keywords.json"
+    return Path(__file__).with_name("keywords.json")
+
+
+BUNDLE_ROOT = get_bundle_root()
+TEMPLATES_DIR = BUNDLE_ROOT / "templates"
+STATIC_DIR = BUNDLE_ROOT / "static"
+DEFAULT_KEYWORDS_FILE = BUNDLE_ROOT / "keywords.json"
+KEYWORDS_FILE = get_keywords_file()
+
+app = Flask(__name__, template_folder=str(TEMPLATES_DIR), static_folder=str(STATIC_DIR))
 
 
 def format_keywords_text(keywords: list[str]) -> str:
@@ -31,6 +55,7 @@ def parse_keywords_text(raw_keywords: str) -> list[str]:
 
 
 def save_keywords_file(keywords: list[str]) -> None:
+    KEYWORDS_FILE.parent.mkdir(parents=True, exist_ok=True)
     KEYWORDS_FILE.write_text(
         json.dumps({"keywords": keywords}, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
@@ -40,7 +65,10 @@ def save_keywords_file(keywords: list[str]) -> None:
 def ensure_keywords_file() -> list[str]:
     if KEYWORDS_FILE.exists():
         return load_keywords(KEYWORDS_FILE)
-    raise SearchError(f"No se encontro el archivo de keywords: {KEYWORDS_FILE}")
+
+    keywords = load_keywords(DEFAULT_KEYWORDS_FILE)
+    save_keywords_file(keywords)
+    return keywords
 
 
 @app.route("/", methods=["GET", "POST"])

@@ -12,6 +12,7 @@ El repositorio queda orientado a una sola version activa del proyecto: la aplica
 - Aplicacion local: [`desktop_app/`](desktop_app/)
 - Script de instalacion: [`install_desktop.bat`](install_desktop.bat)
 - Script de ejecucion: [`run_desktop.bat`](run_desktop.bat)
+- Script de build para `.exe`: [`build_desktop_exe.bat`](build_desktop_exe.bat)
 
 ## Que hace la herramienta
 
@@ -32,6 +33,16 @@ El repositorio queda orientado a una sola version activa del proyecto: la aplica
 
 La aplicacion corre localmente en `http://127.0.0.1:7861`.
 
+## Generar ejecutable para Windows
+
+1. Ejecutar `build_desktop_exe.bat`.
+2. El script instala PyInstaller y genera el ejecutable.
+3. El resultado queda en `dist/RelevamientoBORA.exe`.
+
+Al ejecutarse empaquetada, la aplicacion guarda las keywords editables en una carpeta persistente del usuario:
+
+- `%APPDATA%\BibliotecaCPAU\RelevamientoBORA\keywords.json`
+
 ## Antecedente
 
 El notebook original de Google Colab se conserva en [`notebooks/Busqueda_Boletin_Oficial_RA_v3.ipynb`](notebooks/Busqueda_Boletin_Oficial_RA_v3.ipynb) solo como antecedente de prototipado.
@@ -42,6 +53,7 @@ El notebook original de Google Colab se conserva en [`notebooks/Busqueda_Boletin
 .
 |-- desktop_app/
 |   |-- app.py
+|   |-- build_requirements.txt
 |   |-- keywords.json
 |   |-- requirements.txt
 |   |-- search_core.py
@@ -50,6 +62,7 @@ El notebook original de Google Colab se conserva en [`notebooks/Busqueda_Boletin
 |   |   `-- styles.css
 |   `-- templates/
 |       `-- index.html
+|-- build_desktop_exe.bat
 |-- notebooks/
 |   `-- Busqueda_Boletin_Oficial_RA_v3.ipynb
 |-- install_desktop.bat
@@ -61,10 +74,12 @@ El notebook original de Google Colab se conserva en [`notebooks/Busqueda_Boletin
 ## Organizacion del codigo
 
 - `desktop_app/app.py` contiene la aplicacion Flask local.
+- `desktop_app/build_requirements.txt` define las dependencias para empaquetado.
 - `desktop_app/search_core.py` contiene la logica de descarga, lectura de PDF y busqueda.
 - `desktop_app/keywords.json` guarda el listado editable de keywords.
 - `desktop_app/templates/index.html` define la interfaz HTML.
 - `desktop_app/static/` contiene estilos y assets visuales.
+- `build_desktop_exe.bat` genera un `.exe` con PyInstaller.
 - `notebooks/` conserva el prototipo original en Colab.
 
 ## Tecnologias
