@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Biblioteca CPAU | Busqueda de normativa en el Boletin Oficial de la República Argentina</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <a class="brand" href="/">
+        <img src="{{ url_for('static', filename='biblioteca-logo.png') }}" alt="Biblioteca CPAU">
+      </a>
+      <div class="app-badge">Aplicacion local</div>
+    </header>
+
+    <main>
+      <section class="intro">
+        <p class="section-kicker">Relevamiento BORA</p>
+        <h1>Busqueda de normativa en el Boletin Oficial de la República Argentina</h1>
+        <p>
+          Herramienta local para revisar PDFs del Boletin Oficial con palabras
+          clave y patrones definidos por la Biblioteca CPAU.
+        </p>
+      </section>
+
+      <section class="workspace">
+        <article class="search-card">
+          <form method="post" enctype="multipart/form-data" class="search-form">
+            <div class="field">
+              <label for="url_pdf">URL del PDF</label>
+              <input
+                id="url_pdf"
+                name="url_pdf"
+                type="url"
+                value="{{ selected_url or default_url }}"
+                placeholder="{{ default_url }}"
+              >
+            </div>
+
+            <div class="separator">o</div>
+
+            <div class="field">
+              <label for="pdf_file">Subir PDF desde la PC</label>
+              <input id="pdf_file" name="pdf_file" type="file" accept="application/pdf,.pdf">
+              <p class="hint">Si subis un archivo, se usa ese PDF y se ignora la URL.</p>
+            </div>
+
+            <button type="submit">Buscar normativa relevante</button>
+          </form>
+        </article>
+
+        <aside class="notes-card">
+          <h2>Modo de uso</h2>
+          <p>La aplicacion corre en tu equipo y muestra los resultados en esta misma interfaz HTML.</p>
+          <ul>
+            <li>PDF por URL o archivo local.</li>
+            <li>Busqueda por terminos y regex.</li>
+            <li>Resultados con pagina y fragmento.</li>
+          </ul>
+          <p class="notes-meta">Keywords activas: <strong>{{ keywords_count }}</strong></p>
+        </aside>
+      </section>
+
+      {% if message %}
+        <section class="message message--{{ message_kind }}">
+          {{ message }}
+        </section>
+      {% endif %}
+
+      {% if results %}
+        <section class="results">
+          <div class="results-header">
+            <div>
+              <p class="section-kicker">Resultados</p>
+              <h2>Coincidencias encontradas</h2>
+            </div>
+            <span>{{ results|length }}</span>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Keyword hallada</th>
+                  <th>Pagina</th>
+                  <th>Fragmento</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for result in results %}
+                  <tr>
+                    <td class="keyword">{{ result.keyword }}</td>
+                    <td class="page-number">{{ result.page_number }}</td>
+                    <td>{{ result.fragment }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      {% endif %}
+
+      <details class="keywords-editor">
+        <summary class="editor-summary">
+          <div>
+            <p class="section-kicker">Configuracion</p>
+            <h2>Editar listado de keywords</h2>
+          </div>
+          <span>{{ keywords_count }}</span>
+        </summary>
+
+        <form method="post" class="keywords-form">
+          <input type="hidden" name="action" value="save_keywords">
+          <input type="hidden" name="url_pdf" value="{{ selected_url or default_url }}">
+
+          <div class="field">
+            <label for="keywords_text">Una keyword o expresion regular por linea</label>
+            <textarea
+              id="keywords_text"
+              name="keywords_text"
+              rows="14"
+              spellcheck="false"
+            >{{ keywords_text }}</textarea>
+          </div>
+
+          <div class="keywords-actions">
+            <p class="hint">Abrilo solo cuando necesites actualizar el listado. Los cambios se guardan en el archivo local de configuracion.</p>
+            <button type="submit">Guardar keywords</button>
+          </div>
+        </form>
+      </details>
+    </main>
+
+    <footer class="app-footer">
+      <span>Biblioteca CPAU</span>
+      <span>Herramienta local de relevamiento del Boletin Oficial</span>
+    </footer>
+  </div>
+</body>
+</html>

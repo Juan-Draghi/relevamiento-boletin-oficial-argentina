@@ -1,4 +1,3 @@
-gradio
+flask
 pdfplumber
 requests
-pandas

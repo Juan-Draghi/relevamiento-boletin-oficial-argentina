@@ -1,68 +1,79 @@
-# Relevamiento del Boletin Oficial de la Republica Argentina
+# Busqueda de normativa en el Boletin Oficial de la Republica Argentina
 
 [![Licencia MIT](https://img.shields.io/badge/licencia-MIT-green.svg)](LICENSE)
-[![Abrir en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Juan-Draghi/relevamiento-boletin-oficial-argentina/blob/main/notebooks/Busqueda_Boletin_Oficial_RA_v3.ipynb)
-[![Hugging Face Space](https://img.shields.io/badge/Hugging%20Face-Space-yellow)](https://huggingface.co/spaces/J-Draghi/relevamiento_bora)
 [![Repositorio GitHub](https://img.shields.io/badge/GitHub-Repositorio-black)](https://github.com/Juan-Draghi/relevamiento-boletin-oficial-argentina)
 
-Herramienta para relevar normativa publicada en el Boletin Oficial de la Republica Argentina mediante busquedas por palabras clave y patrones dentro de documentos PDF.
+Aplicacion local para relevar normativa publicada en el Boletin Oficial de la Republica Argentina mediante busquedas por palabras clave y expresiones regulares sobre documentos PDF.
 
-Este repositorio conserva el origen y la evolucion del proyecto:
-
-1. Prototipo inicial desarrollado en Google Colab.
-2. Adaptacion posterior como aplicacion web.
-3. Despliegue publico en Hugging Face Spaces.
+El repositorio queda orientado a una sola version activa del proyecto: la aplicacion de escritorio/local con interfaz HTML.
 
 ## Acceso rapido
 
-- App web: [Relevamiento Bora en Hugging Face Spaces](https://huggingface.co/spaces/J-Draghi/relevamiento_bora)
-- Repositorio: [Juan-Draghi/relevamiento-boletin-oficial-argentina](https://github.com/Juan-Draghi/relevamiento-boletin-oficial-argentina)
-- Notebook original: [Busqueda_Boletin_Oficial_RA_v3.ipynb](https://github.com/Juan-Draghi/relevamiento-boletin-oficial-argentina/blob/main/notebooks/Busqueda_Boletin_Oficial_RA_v3.ipynb)
-- Abrir en Colab: [Google Colab](https://colab.research.google.com/github/Juan-Draghi/relevamiento-boletin-oficial-argentina/blob/main/notebooks/Busqueda_Boletin_Oficial_RA_v3.ipynb)
-- Carpeta para la app web: [`webapp/`](webapp/)
-
+- Aplicacion local: [`desktop_app/`](desktop_app/)
+- Script de instalacion: [`install_desktop.bat`](install_desktop.bat)
+- Script de ejecucion: [`run_desktop.bat`](run_desktop.bat)
 
 ## Que hace la herramienta
 
 - Lee ejemplares del Boletin Oficial en PDF.
+- Acepta una URL de PDF o un archivo local cargado desde la PC.
 - Busca terminos exactos y expresiones regulares.
-- Detecta menciones relevantes dentro del texto.
-- Facilita la revision de normativa de interes profesional.
-- Permite exportar resultados para su analisis posterior.
-
-## Evolucion del proyecto
-
-La primera version fue desarrollada como notebook en Google Colab para experimentar rapido con el procesamiento de PDFs, ajustar palabras clave y exportar resultados sin requerir instalacion local.
-
-Mas adelante, ese prototipo se transformo en una aplicacion web para simplificar el acceso desde navegador y hacer la herramienta mas util para usuarios no tecnicos. La version publicada se encuentra en Hugging Face Spaces.
-
-Frase breve sugerida para describir el proyecto en GitHub:
-
-> Prototipo original en Google Colab, posteriormente adaptado como aplicacion web y desplegado en Hugging Face Spaces.
+- Devuelve coincidencias con numero de pagina y fragmento contextual.
+- Permite editar y guardar el listado de keywords desde la propia interfaz HTML.
 
 ## Como usar
 
-### Opcion 1: usar la app web
+1. Ejecutar `install_desktop.bat` una vez para instalar dependencias.
+2. Ejecutar `run_desktop.bat`.
+3. Se abrira la interfaz local en el navegador.
+4. Ingresar la URL de un PDF o subir un PDF desde la PC.
+5. Ejecutar la busqueda y revisar los resultados.
+6. Si hace falta, desplegar el editor de keywords y actualizar el listado.
 
-1. Abrir el Space en Hugging Face.
-2. Ingresar la URL de un PDF del Boletin Oficial o cargar un archivo PDF.
-3. Ejecutar la busqueda.
-4. Revisar los resultados obtenidos.
+La aplicacion corre localmente en `http://127.0.0.1:7861`.
 
-### Opcion 2: usar el notebook original
+## Antecedente
 
-1. Abrir `notebooks/Busqueda_Boletin_Oficial_RA_v3.ipynb`.
-2. Ejecutar las celdas en Google Colab o en Jupyter.
-3. Ajustar las palabras clave si hace falta.
-4. Exportar y revisar los resultados.
+El notebook original de Google Colab se conserva en [`notebooks/Busqueda_Boletin_Oficial_RA_v3.ipynb`](notebooks/Busqueda_Boletin_Oficial_RA_v3.ipynb) solo como antecedente de prototipado.
 
+## Estructura del repositorio
 
-## Tecnologias y despliegue
+```text
+.
+|-- desktop_app/
+|   |-- app.py
+|   |-- keywords.json
+|   |-- requirements.txt
+|   |-- search_core.py
+|   |-- static/
+|   |   |-- biblioteca-logo.png
+|   |   `-- styles.css
+|   `-- templates/
+|       `-- index.html
+|-- notebooks/
+|   `-- Busqueda_Boletin_Oficial_RA_v3.ipynb
+|-- install_desktop.bat
+|-- LICENSE
+|-- run_desktop.bat
+`-- README.md
+```
 
-- Prototipo inicial: Google Colab / Jupyter Notebook
-- Version web publicada: Hugging Face Spaces
-- Interfaz del Space: Gradio
-- Lenguaje principal: Python
+## Organizacion del codigo
+
+- `desktop_app/app.py` contiene la aplicacion Flask local.
+- `desktop_app/search_core.py` contiene la logica de descarga, lectura de PDF y busqueda.
+- `desktop_app/keywords.json` guarda el listado editable de keywords.
+- `desktop_app/templates/index.html` define la interfaz HTML.
+- `desktop_app/static/` contiene estilos y assets visuales.
+- `notebooks/` conserva el prototipo original en Colab.
+
+## Tecnologias
+
+- Python
+- Flask
+- HTML y CSS
+- pdfplumber
+- requests
 
 ## Licencia
 
