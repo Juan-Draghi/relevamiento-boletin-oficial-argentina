@@ -18,6 +18,7 @@ python -m PyInstaller ^
   --clean ^
   --onefile ^
   --name RelevamientoBORA ^
+  --icon "desktop_app\static\app-icon.ico" ^
   --add-data "desktop_app\templates;templates" ^
   --add-data "desktop_app\static;static" ^
   --add-data "desktop_app\keywords.json;." ^
