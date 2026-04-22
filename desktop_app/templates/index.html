@@ -28,7 +28,7 @@
 
       <section class="workspace">
         <article class="search-card">
-          <form method="post" enctype="multipart/form-data" class="search-form">
+          <form method="post" enctype="multipart/form-data" class="search-form" id="search-form">
             <div class="field">
               <label for="url_pdf">URL del PDF</label>
               <input
@@ -48,7 +48,7 @@
               <p class="hint">Si subis un archivo, se usa ese PDF y se ignora la URL.</p>
             </div>
 
-            <button type="submit">Buscar normativa relevante</button>
+            <button type="submit" id="search-submit">Buscar normativa relevante</button>
           </form>
         </article>
 
@@ -64,44 +64,45 @@
         </aside>
       </section>
 
-      {% if message %}
-        <section class="message message--{{ message_kind }}">
+      <section class="progress-panel" id="progress-panel" hidden>
+        <div class="progress-panel__header">
+          <p class="section-kicker">Progreso</p>
+          <strong id="progress-percent">0%</strong>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-bar__fill" id="progress-bar-fill"></div>
+        </div>
+        <p class="progress-panel__message" id="progress-message">Preparando busqueda...</p>
+      </section>
+
+      <section class="message message--{{ message_kind }}" id="message-box" {% if not message %}hidden{% endif %}>
+        <span id="message-text">
           {{ message }}
-        </section>
-      {% endif %}
+        </span>
+      </section>
 
-      {% if results %}
-        <section class="results">
-          <div class="results-header">
-            <div>
-              <p class="section-kicker">Resultados</p>
-              <h2>Coincidencias encontradas</h2>
-            </div>
-            <span>{{ results|length }}</span>
+      <section class="results" id="results-panel" hidden>
+        <div class="results-header">
+          <div>
+            <p class="section-kicker">Resultados</p>
+            <h2>Coincidencias encontradas</h2>
           </div>
+          <span id="results-count">0</span>
+        </div>
 
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Keyword hallada</th>
-                  <th>Pagina</th>
-                  <th>Fragmento</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for result in results %}
-                  <tr>
-                    <td class="keyword">{{ result.keyword }}</td>
-                    <td class="page-number">{{ result.page_number }}</td>
-                    <td>{{ result.fragment }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      {% endif %}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Keyword hallada</th>
+                <th>Pagina</th>
+                <th>Fragmento</th>
+              </tr>
+            </thead>
+            <tbody id="results-body"></tbody>
+          </table>
+        </div>
+      </section>
 
       <details class="keywords-editor">
         <summary class="editor-summary">
@@ -139,5 +140,119 @@
       <span>Herramienta local de relevamiento del Boletin Oficial</span>
     </footer>
   </div>
+
+  <script>
+    const searchForm = document.getElementById("search-form");
+    const submitButton = document.getElementById("search-submit");
+    const progressPanel = document.getElementById("progress-panel");
+    const progressBarFill = document.getElementById("progress-bar-fill");
+    const progressPercent = document.getElementById("progress-percent");
+    const progressMessage = document.getElementById("progress-message");
+    const messageBox = document.getElementById("message-box");
+    const messageText = document.getElementById("message-text");
+    const resultsPanel = document.getElementById("results-panel");
+    const resultsCount = document.getElementById("results-count");
+    const resultsBody = document.getElementById("results-body");
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function setMessage(text, kind) {
+      messageText.textContent = text;
+      messageBox.hidden = false;
+      messageBox.className = `message message--${kind}`;
+    }
+
+    function updateProgress(job) {
+      progressPanel.hidden = false;
+      progressBarFill.style.width = `${job.progress_percent || 0}%`;
+      progressPercent.textContent = `${job.progress_percent || 0}%`;
+      progressMessage.textContent = job.message || "Procesando...";
+    }
+
+    function clearResults() {
+      resultsBody.innerHTML = "";
+      resultsCount.textContent = "0";
+      resultsPanel.hidden = true;
+    }
+
+    function renderResults(results) {
+      if (!results || results.length === 0) {
+        clearResults();
+        return;
+      }
+
+      resultsBody.innerHTML = results.map((result) => `
+        <tr>
+          <td class="keyword">${escapeHtml(result.keyword)}</td>
+          <td class="page-number">${escapeHtml(result.page_number)}</td>
+          <td>${escapeHtml(result.fragment)}</td>
+        </tr>
+      `).join("");
+
+      resultsCount.textContent = String(results.length);
+      resultsPanel.hidden = false;
+    }
+
+    async function pollJob(jobId) {
+      while (true) {
+        const response = await fetch(`/api/search/${jobId}`);
+        const job = await response.json();
+        updateProgress(job);
+
+        if (job.status === "completed") {
+          renderResults(job.results || []);
+          setMessage(job.message || "Busqueda finalizada.", job.results && job.results.length ? "success" : "info");
+          progressPanel.hidden = true;
+          submitButton.disabled = false;
+          return;
+        }
+
+        if (job.status === "error") {
+          clearResults();
+          setMessage(job.message || "La busqueda fallo.", "error");
+          progressPanel.hidden = true;
+          submitButton.disabled = false;
+          return;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 700));
+      }
+    }
+
+    searchForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      submitButton.disabled = true;
+      clearResults();
+      setMessage("Iniciando busqueda...", "info");
+      updateProgress({ progress_percent: 2, message: "Preparando busqueda..." });
+
+      try {
+        const formData = new FormData(searchForm);
+        const response = await fetch("/api/search", {
+          method: "POST",
+          body: formData,
+        });
+
+        const payload = await response.json();
+        if (!response.ok || !payload.job_id) {
+          throw new Error(payload.message || "No se pudo iniciar la busqueda.");
+        }
+
+        await pollJob(payload.job_id);
+      } catch (error) {
+        progressPanel.hidden = true;
+        submitButton.disabled = false;
+        clearResults();
+        setMessage(error.message || "No se pudo iniciar la busqueda.", "error");
+      }
+    });
+  </script>
 </body>
 </html>

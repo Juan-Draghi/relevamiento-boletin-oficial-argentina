@@ -258,6 +258,11 @@ button:hover {
   border-color: var(--cpau-indigo);
 }
 
+button:disabled {
+  cursor: wait;
+  opacity: 0.75;
+}
+
 .notes-card {
   padding: var(--cpau-space-6);
   background: var(--cpau-bg-section-alt);
@@ -294,6 +299,48 @@ button:hover {
   border-left: 4px solid var(--cpau-blue);
   color: var(--cpau-black);
   font-weight: 600;
+}
+
+.progress-panel {
+  margin-top: var(--cpau-space-8);
+  padding: var(--cpau-space-5) var(--cpau-space-6);
+  background: var(--cpau-white);
+  border: 1px solid var(--cpau-gray-light);
+  border-left: 4px solid var(--cpau-blue);
+}
+
+.progress-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cpau-space-4);
+}
+
+.progress-panel__header strong {
+  color: var(--cpau-navy);
+  font-size: var(--cpau-text-lg);
+  font-weight: 700;
+}
+
+.progress-bar {
+  height: 12px;
+  margin-top: var(--cpau-space-4);
+  background: var(--cpau-bg-section-alt);
+  border-radius: var(--cpau-border-radius);
+  overflow: hidden;
+}
+
+.progress-bar__fill {
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, var(--cpau-blue) 0%, var(--cpau-indigo) 100%);
+  transition: width 300ms ease;
+}
+
+.progress-panel__message {
+  margin: var(--cpau-space-3) 0 0;
+  color: var(--cpau-gray-dark);
+  font-size: var(--cpau-text-sm);
 }
 
 .message--success {
@@ -491,6 +538,7 @@ tbody tr:hover {
 
   .search-card,
   .notes-card,
+  .progress-panel,
   .editor-summary,
   .keywords-form,
   .results-header {
