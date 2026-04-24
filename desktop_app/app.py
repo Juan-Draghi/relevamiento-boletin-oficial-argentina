@@ -13,7 +13,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from desktop_app.search_core import DEFAULT_URL, SearchError, get_pdf_content, load_keywords, search_pdf_content
+from desktop_app.search_core import DEFAULT_URL, SearchError, get_pdf_content, load_keywords
 
 
 def get_bundle_root() -> Path:
@@ -126,7 +126,7 @@ def run_search_job(job_id: str, url_pdf: str, pdf_bytes: bytes | None) -> None:
             )
 
         if results:
-            message = f"Se hallaron {len(results)} coincidencias."
+            message = f"Se detectaron coincidencias en {len(results)} paginas."
         else:
             message = "No se detecto normativa relevante."
 
