@@ -498,6 +498,18 @@ tbody tr:hover {
   font-weight: 600;
 }
 
+.fragment {
+  min-width: 420px;
+  line-height: 1.7;
+}
+
+.fragment mark {
+  padding: 0 0.15rem;
+  background: rgba(52, 0, 255, 0.14);
+  color: var(--cpau-navy);
+  font-weight: 700;
+}
+
 .page-number {
   width: 76px;
   text-align: center;

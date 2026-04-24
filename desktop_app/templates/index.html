@@ -94,7 +94,7 @@
           <table>
             <thead>
               <tr>
-                <th>Keyword hallada</th>
+                <th>Keywords detectadas</th>
                 <th>Pagina</th>
                 <th>Fragmento</th>
               </tr>
@@ -190,9 +190,9 @@
 
       resultsBody.innerHTML = results.map((result) => `
         <tr>
-          <td class="keyword">${escapeHtml(result.keyword)}</td>
+          <td class="keyword">${escapeHtml(result.keyword_label || "")}</td>
           <td class="page-number">${escapeHtml(result.page_number)}</td>
-          <td>${escapeHtml(result.fragment)}</td>
+          <td class="fragment">${result.fragment_html || ""}</td>
         </tr>
       `).join("");
 
