@@ -84,3 +84,20 @@ configuracion del proyecto. Las decisiones de arquitectura se desarrollan en
   1280 y 360 px sin desbordamiento y build exitoso con PyInstaller.
 - ADR: [ADR-0005](../adr/0005-gestion-controlada-de-keywords.md) y
   [ADR-0006](../adr/0006-sistema-visual-operativo.md).
+
+## 2026-07-17 - Publicacion y proteccion de la rama principal
+
+- Tipo: publicacion y gobernanza Git.
+- Cambio: se integro el PR #1 en `main`, se eliminaron las ramas de trabajo
+  local y remota y se alinearon las instrucciones de mantenimiento con el
+  flujo adoptado. `main` permanece protegida y exige pull request, sin
+  aprobaciones externas obligatorias; `force push` y eliminacion siguen
+  bloqueados.
+- Origen: [PR #1](https://github.com/Juan-Draghi/relevamiento-boletin-oficial-argentina/pull/1),
+  commit de merge `f602d05` y decision de configuracion posterior al merge.
+- Validacion registrada: PR en estado `MERGED`, ausencia de pull requests
+  abiertos, unica rama local y remota `main`, y consulta de la proteccion de
+  rama con `required_approving_review_count: 0`, `allow_force_pushes: false` y
+  `allow_deletions: false`.
+- ADR: no corresponde; es una decision operativa de mantenimiento del
+  repositorio y no modifica la arquitectura de la aplicacion.
