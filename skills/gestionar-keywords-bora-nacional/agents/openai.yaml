@@ -1,0 +1,4 @@
+interface:
+  display_name: "Gestionar keywords BORA nacional"
+  short_description: "Validar y registrar keywords del BORA nacional"
+  default_prompt: "Use $gestionar-keywords-bora-nacional para evaluar y agregar una keyword al detector del Boletin Oficial nacional."
