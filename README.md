@@ -1,94 +1,158 @@
-# Busqueda de normativa en el Boletin Oficial de la Republica Argentina
+# Busqueda de normativa en el Boletin Oficial de la República Argentina
 
 [![Licencia MIT](https://img.shields.io/badge/licencia-MIT-green.svg)](LICENSE)
 [![Repositorio GitHub](https://img.shields.io/badge/GitHub-Repositorio-black)](https://github.com/Juan-Draghi/relevamiento-boletin-oficial-argentina)
 
-Aplicacion local para relevar normativa publicada en el Boletin Oficial de la Republica Argentina mediante busquedas por palabras clave y expresiones regulares sobre documentos PDF.
+Aplicacion local para relevar normativa publicada en el Boletin Oficial de la
+Republica Argentina mediante palabras clave y expresiones regulares sobre
+documentos PDF.
 
-El repositorio queda orientado a una sola version activa del proyecto: la aplicacion de escritorio/local con interfaz HTML.
+La version activa es la aplicacion local con interfaz HTML. El notebook de
+Colab se conserva solamente como antecedente.
 
 ## Acceso rapido
 
 - Aplicacion local: [`desktop_app/`](desktop_app/)
-- Script de instalacion: [`install_desktop.bat`](install_desktop.bat)
-- Script de ejecucion: [`run_desktop.bat`](run_desktop.bat)
-- Script de build para `.exe`: [`build_desktop_exe.bat`](build_desktop_exe.bat)
+- Instalacion: [`install_desktop.bat`](install_desktop.bat)
+- Ejecucion: [`run_desktop.bat`](run_desktop.bat)
+- Build del ejecutable: [`build_desktop_exe.bat`](build_desktop_exe.bat)
+- Log de cambios: [`docs/seguimiento/log_cambios.md`](docs/seguimiento/log_cambios.md)
+- Decisiones de arquitectura: [`docs/adr/`](docs/adr/)
+- Skill de keywords: [`skills/gestionar-keywords-bora-nacional/`](skills/gestionar-keywords-bora-nacional/)
 
 ## Que hace la herramienta
 
 - Lee ejemplares del Boletin Oficial en PDF.
-- Acepta una URL de PDF o un archivo local cargado desde la PC.
-- Busca terminos exactos y expresiones regulares.
-- Devuelve coincidencias con numero de pagina y fragmento contextual.
-- Permite editar y guardar el listado de keywords desde la propia interfaz HTML.
+- Acepta una URL o un archivo PDF local.
+- Busca terminos y expresiones regulares.
+- Informa el progreso real por pagina.
+- Devuelve una sola entrada por pagina con todas las keywords detectadas.
+- Resalta las coincidencias dentro de cada fragmento.
+
+## Requisitos previos
+
+- Windows.
+- Python 3 instalado y disponible en `PATH` para ejecutar desde codigo fuente.
+- Conexion a Internet solamente cuando se usa una URL remota.
+
+Las dependencias de ejecucion estan en `desktop_app/requirements.txt`.
 
 ## Como usar
 
-1. Ejecutar `install_desktop.bat` una vez para instalar dependencias.
+1. Ejecutar `install_desktop.bat` una vez.
 2. Ejecutar `run_desktop.bat`.
-3. Se abrira la interfaz local en el navegador.
-4. Ingresar la URL de un PDF o subir un PDF desde la PC.
-5. Ejecutar la busqueda y revisar los resultados.
-6. Si hace falta, desplegar el editor de keywords y actualizar el listado.
+3. La aplicacion abrira `http://127.0.0.1:7861` en el navegador.
+4. Elegir `URL` o `Archivo local`.
+5. Iniciar la busqueda y revisar las paginas detectadas.
 
-La aplicacion corre localmente en `http://127.0.0.1:7861`.
+Cerrar la pestaña del navegador no detiene el proceso local. Para regenerar el
+ejecutable, cerrar primero todas las instancias de `RelevamientoBORA.exe`.
 
-## Generar ejecutable para Windows
+## Gestionar keywords
 
-1. Ejecutar `build_desktop_exe.bat`.
-2. El script instala PyInstaller y genera el ejecutable.
-3. El resultado queda en `dist/RelevamientoBORA.exe`.
+La interfaz no permite editar keywords. La fuente versionada es
+`desktop_app/keywords.json` y los cambios deben realizarse con el skill
+`gestionar-keywords-bora-nacional`.
 
-Al ejecutarse empaquetada, la aplicacion guarda las keywords editables en una carpeta persistente del usuario:
+Ejemplo de invocacion:
 
-- `%APPDATA%\BibliotecaCPAU\RelevamientoBORA\keywords.json`
+```text
+Use $gestionar-keywords-bora-nacional para evaluar y agregar la keyword "termino" al BORA nacional.
+```
 
-## Antecedente
+El skill:
 
-El notebook original de Google Colab se conserva en [`notebooks/Busqueda_Boletin_Oficial_RA_v3.ipynb`](notebooks/Busqueda_Boletin_Oficial_RA_v3.ipynb) solo como antecedente de prototipado.
+- verifica duplicados y cobertura por patrones existentes;
+- determina si corresponde usar un literal o un regex acotado;
+- exige casos positivos y negativos;
+- valida el JSON y el patron;
+- registra el cambio en `docs/seguimiento/log_cambios.md`.
 
-## Estructura del repositorio
+No usar para este proyecto el skill `ajustar-keywords-bo-caba`: el detector
+CABA tiene otro repositorio, otro esquema de configuracion y otras reglas.
+
+Cuando la aplicacion corre empaquetada, conserva las keywords del usuario en:
+
+```text
+%LOCALAPPDATA%\BibliotecaCPAU\RelevamientoBORA\keywords.json
+```
+
+Al iniciar un build nuevo, agrega al archivo persistente las keywords
+versionadas que aun no existan, sin borrar terminos personalizados anteriores.
+
+## Generar el ejecutable
+
+1. Cerrar todas las instancias de `RelevamientoBORA.exe`.
+2. Ejecutar `build_desktop_exe.bat`.
+3. Usar el archivo generado en `dist/RelevamientoBORA.exe`.
+
+El build usa PyInstaller en modo `--onefile --windowed`.
+
+## Trazabilidad
+
+Los cambios funcionales, tecnicos y de configuracion se agregan de forma
+cronologica a `docs/seguimiento/log_cambios.md`.
+
+Las decisiones que afectan arquitectura, limites o forma de operacion se
+documentan como ADR en `docs/adr/`. El indice y los estados estan en
+`docs/adr/README.md`.
+
+## Estructura principal
 
 ```text
 .
 |-- desktop_app/
 |   |-- app.py
-|   |-- build_requirements.txt
 |   |-- keywords.json
-|   |-- requirements.txt
 |   |-- search_core.py
+|   |-- requirements.txt
+|   |-- build_requirements.txt
 |   |-- static/
-|   |   |-- biblioteca-logo.png
-|   |   `-- styles.css
 |   `-- templates/
-|       `-- index.html
-|-- build_desktop_exe.bat
+|-- docs/
+|   |-- adr/
+|   `-- seguimiento/
+|-- skills/
+|   `-- gestionar-keywords-bora-nacional/
+|-- tests/
 |-- notebooks/
-|   `-- Busqueda_Boletin_Oficial_RA_v3.ipynb
+|-- build_desktop_exe.bat
 |-- install_desktop.bat
-|-- LICENSE
 |-- run_desktop.bat
 `-- README.md
 ```
 
 ## Organizacion del codigo
 
-- `desktop_app/app.py` contiene la aplicacion Flask local.
-- `desktop_app/build_requirements.txt` define las dependencias para empaquetado.
-- `desktop_app/search_core.py` contiene la logica de descarga, lectura de PDF y busqueda.
-- `desktop_app/keywords.json` guarda el listado editable de keywords.
-- `desktop_app/templates/index.html` define la interfaz HTML.
-- `desktop_app/static/` contiene estilos y assets visuales.
-- `build_desktop_exe.bat` genera un `.exe` con PyInstaller.
-- `notebooks/` conserva el prototipo original en Colab.
+- `desktop_app/search_core.py`: descarga, lectura de PDF, matching y resultados.
+- `desktop_app/app.py`: Flask, API local, progreso y persistencia.
+- `desktop_app/templates/index.html`: interfaz operativa.
+- `desktop_app/static/`: estilos, logo e icono.
+- `skills/gestionar-keywords-bora-nacional/`: procedimiento auditable de
+  mantenimiento de keywords.
+- `notebooks/`: prototipo historico de Google Colab.
+
+## Pruebas
+
+```powershell
+python -m compileall desktop_app
+python -m unittest discover -s tests
+```
+
+Para verificar el empaquetado:
+
+```powershell
+cmd /c build_desktop_exe.bat
+```
 
 ## Tecnologias
 
 - Python
 - Flask
-- HTML y CSS
+- HTML, CSS y JavaScript nativos
 - pdfplumber
 - requests
+- PyInstaller
 
 ## Licencia
 

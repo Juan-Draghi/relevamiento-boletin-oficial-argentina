@@ -4,147 +4,132 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Biblioteca CPAU | Busqueda de normativa en el Boletin Oficial de la República Argentina</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-  <div class="app-shell">
-    <header class="app-header">
-      <a class="brand" href="/">
+  <header class="app-header">
+    <div class="app-header__inner">
+      <a class="brand" href="/" aria-label="Biblioteca CPAU, inicio">
         <img src="{{ url_for('static', filename='biblioteca-logo.png') }}" alt="Biblioteca CPAU">
       </a>
-      <div class="app-badge">Aplicacion local</div>
-    </header>
+      <div class="app-status">
+        <span class="app-status__dot" aria-hidden="true"></span>
+        Aplicacion local
+      </div>
+    </div>
+  </header>
 
-    <main>
-      <section class="intro">
+  <main class="app-shell">
+    <section class="intro" aria-labelledby="page-title">
+      <div class="intro__copy">
         <p class="section-kicker">Relevamiento BORA</p>
-        <h1>Busqueda de normativa en el Boletin Oficial de la República Argentina</h1>
-        <p>
-          Herramienta local para revisar PDFs del Boletin Oficial con palabras
-          clave y patrones definidos por la Biblioteca CPAU.
+        <h1 id="page-title">Busqueda de normativa en el Boletin Oficial de la República Argentina</h1>
+        <p class="intro__description">
+          Analisis local de documentos PDF mediante los terminos y patrones
+          definidos por la Biblioteca CPAU.
         </p>
-      </section>
+      </div>
+      <div class="keyword-summary" aria-label="Configuracion de busqueda activa">
+        <span>Configuracion activa</span>
+        <strong>{{ keywords_count }}</strong>
+        <small>keywords</small>
+      </div>
+    </section>
 
-      <section class="workspace">
-        <article class="search-card">
-          <form method="post" enctype="multipart/form-data" class="search-form" id="search-form">
-            <div class="field">
-              <label for="url_pdf">URL del PDF</label>
-              <input
-                id="url_pdf"
-                name="url_pdf"
-                type="url"
-                value="{{ selected_url or default_url }}"
-                placeholder="{{ default_url }}"
-              >
-            </div>
-
-            <div class="separator">o</div>
-
-            <div class="field">
-              <label for="pdf_file">Subir PDF desde la PC</label>
-              <input id="pdf_file" name="pdf_file" type="file" accept="application/pdf,.pdf">
-              <p class="hint">Si subis un archivo, se usa ese PDF y se ignora la URL.</p>
-            </div>
-
-            <button type="submit" id="search-submit">Buscar normativa relevante</button>
-          </form>
-        </article>
-
-        <aside class="notes-card">
-          <h2>Modo de uso</h2>
-          <p>La aplicacion corre en tu equipo y muestra los resultados en esta misma interfaz HTML.</p>
-          <ul>
-            <li>PDF por URL o archivo local.</li>
-            <li>Busqueda por terminos y regex.</li>
-            <li>Resultados con pagina y fragmento.</li>
-          </ul>
-          <p class="notes-meta">Keywords activas: <strong>{{ keywords_count }}</strong></p>
-        </aside>
-      </section>
-
-      <section class="progress-panel" id="progress-panel" hidden>
-        <div class="progress-panel__header">
-          <p class="section-kicker">Progreso</p>
-          <strong id="progress-percent">0%</strong>
+    <section class="search-panel" aria-labelledby="search-title">
+      <div class="panel-heading">
+        <div>
+          <p class="section-kicker">Nueva busqueda</p>
+          <h2 id="search-title">Seleccionar documento</h2>
         </div>
-        <div class="progress-bar">
-          <div class="progress-bar__fill" id="progress-bar-fill"></div>
-        </div>
-        <p class="progress-panel__message" id="progress-message">Preparando busqueda...</p>
-      </section>
+      </div>
 
-      <section class="message message--{{ message_kind }}" id="message-box" {% if not message %}hidden{% endif %}>
-        <span id="message-text">
-          {{ message }}
-        </span>
-      </section>
-
-      <section class="results" id="results-panel" hidden>
-        <div class="results-header">
-          <div>
-            <p class="section-kicker">Resultados</p>
-            <h2>Coincidencias encontradas</h2>
+      <form method="post" enctype="multipart/form-data" class="search-form" id="search-form">
+        <fieldset class="source-selector">
+          <legend>Origen del PDF</legend>
+          <div class="segmented-control">
+            <label>
+              <input type="radio" name="source_mode" value="url" checked>
+              <span>URL</span>
+            </label>
+            <label>
+              <input type="radio" name="source_mode" value="file">
+              <span>Archivo local</span>
+            </label>
           </div>
-          <span id="results-count">0</span>
-        </div>
+        </fieldset>
 
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Keyword hallada</th>
-                <th>Pagina</th>
-                <th>Fragmento</th>
-              </tr>
-            </thead>
-            <tbody id="results-body"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <details class="keywords-editor">
-        <summary class="editor-summary">
-          <div>
-            <p class="section-kicker">Configuracion</p>
-            <h2>Editar listado de keywords</h2>
-          </div>
-          <span>{{ keywords_count }}</span>
-        </summary>
-
-        <form method="post" class="keywords-form">
-          <input type="hidden" name="action" value="save_keywords">
-          <input type="hidden" name="url_pdf" value="{{ selected_url or default_url }}">
-
-          <div class="field">
-            <label for="keywords_text">Una keyword o expresion regular por linea</label>
-            <textarea
-              id="keywords_text"
-              name="keywords_text"
-              rows="14"
-              spellcheck="false"
-            >{{ keywords_text }}</textarea>
+        <div class="source-fields">
+          <div class="field" id="url-source">
+            <label for="url_pdf">URL del PDF</label>
+            <input
+              id="url_pdf"
+              name="url_pdf"
+              type="url"
+              value="{{ selected_url or default_url }}"
+              placeholder="{{ default_url }}"
+              required
+            >
           </div>
 
-          <div class="keywords-actions">
-            <p class="hint">Abrilo solo cuando necesites actualizar el listado. Los cambios se guardan en el archivo local de configuracion.</p>
-            <button type="submit">Guardar keywords</button>
+          <div class="field" id="file-source" hidden>
+            <label for="pdf_file">Archivo PDF</label>
+            <input id="pdf_file" name="pdf_file" type="file" accept="application/pdf,.pdf" disabled>
           </div>
-        </form>
-      </details>
-    </main>
+        </div>
 
-    <footer class="app-footer">
+        <div class="form-actions">
+          <button type="submit" id="search-submit">Iniciar busqueda</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="progress-panel" id="progress-panel" role="status" aria-live="polite" hidden>
+      <div class="progress-panel__header">
+        <div>
+          <p class="section-kicker">Procesamiento</p>
+          <p class="progress-panel__message" id="progress-message">Preparando busqueda...</p>
+        </div>
+        <strong id="progress-percent">0%</strong>
+      </div>
+      <div class="progress-bar" role="progressbar" aria-label="Progreso de la busqueda" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="progress-bar__fill" id="progress-bar-fill"></div>
+      </div>
+    </section>
+
+    <section class="message message--info" id="message-box" role="status" aria-live="polite" hidden>
+      <span id="message-text"></span>
+    </section>
+
+    <section class="results" id="results-panel" aria-labelledby="results-title" hidden>
+      <div class="results-header">
+        <div>
+          <p class="section-kicker">Resultados</p>
+          <h2 id="results-title">Coincidencias encontradas</h2>
+        </div>
+        <span class="results-count" id="results-count">0 paginas</span>
+      </div>
+      <div class="results-list" id="results-body"></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="app-footer__inner">
       <span>Biblioteca CPAU</span>
-      <span>Herramienta local de relevamiento del Boletin Oficial</span>
-    </footer>
-  </div>
+      <span>Relevamiento local del Boletin Oficial</span>
+    </div>
+  </footer>
 
   <script>
     const searchForm = document.getElementById("search-form");
     const submitButton = document.getElementById("search-submit");
+    const sourceRadios = document.querySelectorAll('input[name="source_mode"]');
+    const urlSource = document.getElementById("url-source");
+    const fileSource = document.getElementById("file-source");
+    const urlInput = document.getElementById("url_pdf");
+    const fileInput = document.getElementById("pdf_file");
     const progressPanel = document.getElementById("progress-panel");
+    const progressBar = progressPanel.querySelector('[role="progressbar"]');
     const progressBarFill = document.getElementById("progress-bar-fill");
     const progressPercent = document.getElementById("progress-percent");
     const progressMessage = document.getElementById("progress-message");
@@ -163,6 +148,16 @@
         .replaceAll("'", "&#39;");
     }
 
+    function setSourceMode(mode) {
+      const useFile = mode === "file";
+      urlSource.hidden = useFile;
+      fileSource.hidden = !useFile;
+      urlInput.disabled = useFile;
+      urlInput.required = !useFile;
+      fileInput.disabled = !useFile;
+      fileInput.required = useFile;
+    }
+
     function setMessage(text, kind) {
       messageText.textContent = text;
       messageBox.hidden = false;
@@ -170,15 +165,23 @@
     }
 
     function updateProgress(job) {
+      const percent = job.progress_percent || 0;
       progressPanel.hidden = false;
-      progressBarFill.style.width = `${job.progress_percent || 0}%`;
-      progressPercent.textContent = `${job.progress_percent || 0}%`;
+      progressBarFill.style.width = `${percent}%`;
+      progressBar.setAttribute("aria-valuenow", String(percent));
+      progressPercent.textContent = `${percent}%`;
       progressMessage.textContent = job.message || "Procesando...";
+    }
+
+    function setSearching(isSearching) {
+      submitButton.disabled = isSearching;
+      submitButton.setAttribute("aria-busy", String(isSearching));
+      submitButton.textContent = isSearching ? "Procesando..." : "Iniciar busqueda";
     }
 
     function clearResults() {
       resultsBody.innerHTML = "";
-      resultsCount.textContent = "0";
+      resultsCount.textContent = "0 paginas";
       resultsPanel.hidden = true;
     }
 
@@ -189,14 +192,20 @@
       }
 
       resultsBody.innerHTML = results.map((result) => `
-        <tr>
-          <td class="keyword">${escapeHtml(result.keyword)}</td>
-          <td class="page-number">${escapeHtml(result.page_number)}</td>
-          <td>${escapeHtml(result.fragment)}</td>
-        </tr>
+        <article class="result-card">
+          <div class="result-card__meta">
+            <span class="page-badge">Pagina ${escapeHtml(result.page_number)}</span>
+            <div class="keyword-group">
+              <span>Keywords detectadas</span>
+              <strong>${escapeHtml(result.keyword_label || "")}</strong>
+            </div>
+          </div>
+          <p class="result-fragment">${result.fragment_html || ""}</p>
+        </article>
       `).join("");
 
-      resultsCount.textContent = String(results.length);
+      const pageLabel = results.length === 1 ? "pagina" : "paginas";
+      resultsCount.textContent = `${results.length} ${pageLabel}`;
       resultsPanel.hidden = false;
     }
 
@@ -204,13 +213,16 @@
       while (true) {
         const response = await fetch(`/api/search/${jobId}`);
         const job = await response.json();
+        if (!response.ok) {
+          throw new Error(job.message || "No se pudo consultar la busqueda.");
+        }
         updateProgress(job);
 
         if (job.status === "completed") {
           renderResults(job.results || []);
           setMessage(job.message || "Busqueda finalizada.", job.results && job.results.length ? "success" : "info");
           progressPanel.hidden = true;
-          submitButton.disabled = false;
+          setSearching(false);
           return;
         }
 
@@ -218,7 +230,7 @@
           clearResults();
           setMessage(job.message || "La busqueda fallo.", "error");
           progressPanel.hidden = true;
-          submitButton.disabled = false;
+          setSearching(false);
           return;
         }
 
@@ -226,9 +238,18 @@
       }
     }
 
+    sourceRadios.forEach((radio) => {
+      radio.addEventListener("change", () => setSourceMode(radio.value));
+    });
+    setSourceMode(document.querySelector('input[name="source_mode"]:checked').value);
+
     searchForm.addEventListener("submit", async (event) => {
       event.preventDefault();
-      submitButton.disabled = true;
+      if (!searchForm.reportValidity()) {
+        return;
+      }
+
+      setSearching(true);
       clearResults();
       setMessage("Iniciando busqueda...", "info");
       updateProgress({ progress_percent: 2, message: "Preparando busqueda..." });
@@ -248,7 +269,7 @@
         await pollJob(payload.job_id);
       } catch (error) {
         progressPanel.hidden = true;
-        submitButton.disabled = false;
+        setSearching(false);
         clearResults();
         setMessage(error.message || "No se pudo iniciar la busqueda.", "error");
       }

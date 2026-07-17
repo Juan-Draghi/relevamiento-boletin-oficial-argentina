@@ -13,7 +13,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from desktop_app.search_core import DEFAULT_URL, SearchError, get_pdf_content, load_keywords, search_pdf_content
+from desktop_app.search_core import DEFAULT_URL, SearchError, get_pdf_content, load_keywords
 
 
 def get_bundle_root() -> Path:
@@ -46,18 +46,7 @@ SEARCH_JOBS: dict[str, dict[str, object]] = {}
 SEARCH_JOBS_LOCK = threading.Lock()
 
 
-def format_keywords_text(keywords: list[str]) -> str:
-    return "\n".join(keywords)
-
-
-def parse_keywords_text(raw_keywords: str) -> list[str]:
-    keywords = [line.strip() for line in raw_keywords.splitlines() if line.strip()]
-    if not keywords:
-        raise SearchError("Debes ingresar al menos una keyword.")
-    return keywords
-
-
-def save_keywords_file(keywords: list[str]) -> None:
+def write_keywords_file(keywords: list[str]) -> None:
     KEYWORDS_FILE.parent.mkdir(parents=True, exist_ok=True)
     KEYWORDS_FILE.write_text(
         json.dumps({"keywords": keywords}, ensure_ascii=False, indent=2) + "\n",
@@ -65,13 +54,35 @@ def save_keywords_file(keywords: list[str]) -> None:
     )
 
 
-def ensure_keywords_file() -> list[str]:
-    if KEYWORDS_FILE.exists():
-        return load_keywords(KEYWORDS_FILE)
+def merge_keywords(existing_keywords: list[str], default_keywords: list[str]) -> list[str]:
+    """Preserve user terms and append new keywords bundled with the app."""
+    merged = list(existing_keywords)
+    seen = {keyword.strip().casefold() for keyword in existing_keywords}
 
-    keywords = load_keywords(DEFAULT_KEYWORDS_FILE)
-    save_keywords_file(keywords)
-    return keywords
+    for keyword in default_keywords:
+        normalized = keyword.strip().casefold()
+        if normalized not in seen:
+            merged.append(keyword)
+            seen.add(normalized)
+
+    return merged
+
+
+def ensure_keywords_file() -> list[str]:
+    default_keywords = load_keywords(DEFAULT_KEYWORDS_FILE)
+
+    if KEYWORDS_FILE.resolve() == DEFAULT_KEYWORDS_FILE.resolve():
+        return default_keywords
+
+    if not KEYWORDS_FILE.exists():
+        write_keywords_file(default_keywords)
+        return default_keywords
+
+    existing_keywords = load_keywords(KEYWORDS_FILE)
+    merged_keywords = merge_keywords(existing_keywords, default_keywords)
+    if merged_keywords != existing_keywords:
+        write_keywords_file(merged_keywords)
+    return merged_keywords
 
 
 def set_job_state(job_id: str, **updates: object) -> None:
@@ -126,7 +137,7 @@ def run_search_job(job_id: str, url_pdf: str, pdf_bytes: bytes | None) -> None:
             )
 
         if results:
-            message = f"Se hallaron {len(results)} coincidencias."
+            message = f"Se detectaron coincidencias en {len(results)} paginas."
         else:
             message = "No se detecto normativa relevante."
 
@@ -154,47 +165,14 @@ def search_pdf_content_with_progress(pdf_content: bytes, keywords: list[str]):
     yield from iter_page_results(pdf_content, keywords)
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.get("/")
 def index():
-    message = ""
-    message_kind = "info"
-    selected_url = DEFAULT_URL
     keywords = ensure_keywords_file()
-    keywords_text = format_keywords_text(keywords)
-
-    if request.method == "POST":
-        action = request.form.get("action", "search")
-        selected_url = request.form.get("url_pdf", "").strip() or DEFAULT_URL
-        posted_keywords_text = request.form.get("keywords_text")
-
-        try:
-            if action == "save_keywords":
-                keywords_text = (posted_keywords_text or "").strip()
-                keywords = parse_keywords_text(keywords_text)
-                save_keywords_file(keywords)
-                message = f"Listado de keywords actualizado: {len(keywords)} terminos."
-                message_kind = "success"
-            else:
-                if posted_keywords_text is not None and posted_keywords_text.strip():
-                    keywords_text = posted_keywords_text.strip()
-                    keywords = parse_keywords_text(keywords_text)
-                else:
-                    keywords = ensure_keywords_file()
-                    keywords_text = format_keywords_text(keywords)
-
-                message = "Usa el boton de busqueda para iniciar el analisis."
-        except SearchError as exc:
-            message = f"Error: {exc}"
-            message_kind = "error"
-
     return render_template(
         "index.html",
         default_url=DEFAULT_URL,
         keywords_count=len(keywords),
-        keywords_text=keywords_text,
-        message=message,
-        message_kind=message_kind,
-        selected_url=selected_url,
+        selected_url=DEFAULT_URL,
     )
 
 
