@@ -101,3 +101,23 @@ configuracion del proyecto. Las decisiones de arquitectura se desarrollan en
   `allow_deletions: false`.
 - ADR: no corresponde; es una decision operativa de mantenimiento del
   repositorio y no modifica la arquitectura de la aplicacion.
+
+## 2026-11-14 - Migracion del asistente de desarrollo a Claude Code
+
+- Tipo: configuracion del entorno de desarrollo y documentacion.
+- Cambio: se agrego `CLAUDE.md`, que importa `AGENTS.md` para conservar una
+  sola fuente de instrucciones; la skill `gestionar-keywords-bora-nacional` se
+  movio de `skills/` a `.claude/skills/` para que Claude Code la detecte como
+  skill de proyecto, y se actualizaron sus rutas, la de
+  `tests/test_keyword_manager.py`, `AGENTS.md` y `README.md`. El prefijo de
+  ramas de trabajo pasa de `codex/` a `claude/`. Las skills globales usadas
+  con Codex se copiaron a la carpeta de usuario de Claude Code, fuera del
+  repositorio.
+- Origen: decision de la persona usuaria de gestionar el proyecto con Claude
+  Code en lugar de Codex.
+- Validacion registrada: `python -m compileall desktop_app`,
+  `python -m unittest discover -s tests`, comando `check` de la skill desde su
+  nueva ruta y `git diff --check`.
+- ADR: no corresponde; no modifica la arquitectura de la aplicacion. El
+  ADR-0006 se conserva sin cambios: la skill `disenar-interfaces-operativas`
+  sigue siendo la referencia, ahora disponible como skill global de Claude Code.

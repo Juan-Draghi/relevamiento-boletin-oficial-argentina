@@ -18,7 +18,8 @@ Colab se conserva solamente como antecedente.
 - Build del ejecutable: [`build_desktop_exe.bat`](build_desktop_exe.bat)
 - Log de cambios: [`docs/seguimiento/log_cambios.md`](docs/seguimiento/log_cambios.md)
 - Decisiones de arquitectura: [`docs/adr/`](docs/adr/)
-- Skill de keywords: [`skills/gestionar-keywords-bora-nacional/`](skills/gestionar-keywords-bora-nacional/)
+- Skill de keywords: [`.claude/skills/gestionar-keywords-bora-nacional/`](.claude/skills/gestionar-keywords-bora-nacional/)
+- Instrucciones para agentes: [`AGENTS.md`](AGENTS.md) (Claude Code las incorpora mediante [`CLAUDE.md`](CLAUDE.md))
 
 ## Que hace la herramienta
 
@@ -101,6 +102,9 @@ documentan como ADR en `docs/adr/`. El indice y los estados estan en
 
 ```text
 .
+|-- .claude/
+|   `-- skills/
+|       `-- gestionar-keywords-bora-nacional/
 |-- desktop_app/
 |   |-- app.py
 |   |-- keywords.json
@@ -112,13 +116,13 @@ documentan como ADR en `docs/adr/`. El indice y los estados estan en
 |-- docs/
 |   |-- adr/
 |   `-- seguimiento/
-|-- skills/
-|   `-- gestionar-keywords-bora-nacional/
 |-- tests/
 |-- notebooks/
 |-- build_desktop_exe.bat
 |-- install_desktop.bat
 |-- run_desktop.bat
+|-- AGENTS.md
+|-- CLAUDE.md
 `-- README.md
 ```
 
@@ -128,8 +132,8 @@ documentan como ADR en `docs/adr/`. El indice y los estados estan en
 - `desktop_app/app.py`: Flask, API local, progreso y persistencia.
 - `desktop_app/templates/index.html`: interfaz operativa.
 - `desktop_app/static/`: estilos, logo e icono.
-- `skills/gestionar-keywords-bora-nacional/`: procedimiento auditable de
-  mantenimiento de keywords.
+- `.claude/skills/gestionar-keywords-bora-nacional/`: procedimiento auditable de
+  mantenimiento de keywords (skill de proyecto de Claude Code).
 - `notebooks/`: prototipo historico de Google Colab.
 
 ## Pruebas
@@ -162,4 +166,4 @@ Este proyecto se distribuye bajo la [Licencia MIT](LICENSE).
 
 Juan Draghi  
 Biblioteca del Consejo Profesional de Arquitectura y Urbanismo  
-Con asistencia de ChatGPT
+Con asistencia de ChatGPT y Claude
