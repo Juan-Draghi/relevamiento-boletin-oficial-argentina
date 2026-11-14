@@ -2,7 +2,7 @@
 name: gestionar-keywords-bora-nacional
 description: >-
   Evaluar, agregar, validar y registrar keywords o patrones regex del buscador
-  local del Boletin Oficial de la Republica Argentina. Use when Codex works in
+  local del Boletin Oficial de la Republica Argentina. Use when working in
   the relevamiento-boletin-oficial-argentina repository and the user asks to
   add a term, legal reference or spelling variant to desktop_app/keywords.json.
   Check duplicates and existing pattern coverage, decide whether regex is
@@ -20,7 +20,8 @@ expresion regular con `re.IGNORECASE`.
 
 ## Confirmar el proyecto
 
-1. Leer `AGENTS.md` y ejecutar `git status --short`.
+1. Leer las instrucciones del proyecto (`AGENTS.md`, incorporado por
+   `CLAUDE.md`) y ejecutar `git status --short`.
 2. Confirmar que existen:
    - `desktop_app/keywords.json`;
    - `desktop_app/search_core.py`;
@@ -37,7 +38,7 @@ expresion regular con `re.IGNORECASE`.
 2. Ejecutar, desde la raiz del repo:
 
 ```powershell
-python skills/gestionar-keywords-bora-nacional/scripts/manage_keyword.py check --repo . --candidate "TERMINO"
+python .claude/skills/gestionar-keywords-bora-nacional/scripts/manage_keyword.py check --repo . --candidate "TERMINO"
 ```
 
 3. Revisar:
@@ -87,7 +88,7 @@ amplie el alcance del termino solicitado.
 Usar el script para modificar simultaneamente la configuracion y el log:
 
 ```powershell
-python skills/gestionar-keywords-bora-nacional/scripts/manage_keyword.py add `
+python .claude/skills/gestionar-keywords-bora-nacional/scripts/manage_keyword.py add `
   --repo . `
   --value "VALOR_APROBADO" `
   --reason "MOTIVO" `
