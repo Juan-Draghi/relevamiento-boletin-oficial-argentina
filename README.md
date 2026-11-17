@@ -15,6 +15,7 @@ Colab se conserva solamente como antecedente.
 - Aplicacion local: [`desktop_app/`](desktop_app/)
 - Instalacion: [`install_desktop.bat`](install_desktop.bat)
 - Ejecucion: [`run_desktop.bat`](run_desktop.bat)
+- Detencion: [`stop_desktop.bat`](stop_desktop.bat)
 - Build del ejecutable: [`build_desktop_exe.bat`](build_desktop_exe.bat)
 - Log de cambios: [`docs/seguimiento/log_cambios.md`](docs/seguimiento/log_cambios.md)
 - Decisiones de arquitectura: [`docs/adr/`](docs/adr/)
@@ -46,8 +47,18 @@ Las dependencias de ejecucion estan en `desktop_app/requirements.txt`.
 4. Elegir `URL` o `Archivo local`.
 5. Iniciar la busqueda y revisar las paginas detectadas.
 
-Cerrar la pestaña del navegador no detiene el proceso local. Para regenerar el
-ejecutable, cerrar primero todas las instancias de `RelevamientoBORA.exe`.
+Cerrar la pestaña del navegador no detiene el proceso local. Para detenerlo,
+ejecutar:
+
+```bat
+stop_desktop.bat
+```
+
+El script cierra todo proceso que escuche en el puerto 7861: sirve tanto para
+la app iniciada desde codigo fuente como para `RelevamientoBORA.exe`.
+`run_desktop.bat` lo ejecuta antes de iniciar, para no dejar copias duplicadas.
+Abrir el `.exe` con doble clic no cierra las copias previas: en ese caso,
+ejecutar antes `stop_desktop.bat`.
 
 ## Gestionar keywords
 
@@ -83,7 +94,7 @@ versionadas que aun no existan, sin borrar terminos personalizados anteriores.
 
 ## Generar el ejecutable
 
-1. Cerrar todas las instancias de `RelevamientoBORA.exe`.
+1. Cerrar todas las instancias de `RelevamientoBORA.exe` con `stop_desktop.bat`.
 2. Ejecutar `build_desktop_exe.bat`.
 3. Usar el archivo generado en `dist/RelevamientoBORA.exe`.
 
@@ -121,6 +132,7 @@ documentan como ADR en `docs/adr/`. El indice y los estados estan en
 |-- build_desktop_exe.bat
 |-- install_desktop.bat
 |-- run_desktop.bat
+|-- stop_desktop.bat
 |-- AGENTS.md
 |-- CLAUDE.md
 `-- README.md

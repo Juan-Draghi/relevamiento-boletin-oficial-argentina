@@ -160,3 +160,21 @@ configuracion del proyecto. Las decisiones de arquitectura se desarrollan en
   `.exe` en el puerto 7861 con la interfaz nueva; las keywords sincronizadas
   en los datos del usuario se siguieron cargando (38).
 - ADR: [ADR-0007](../adr/0007-marca-biblioteca-cpau-en-la-interfaz.md).
+
+## 2026-11-17 - Script para detener la aplicacion local
+
+- Tipo: cambio funcional de ejecucion.
+- Cambio: se agrego `stop_desktop.bat`, que cierra todo proceso que escuche en
+  el puerto 7861 (codigo fuente o `RelevamientoBORA.exe`), con el mismo
+  mecanismo que la app del BO CABA (`netstat` + `taskkill`).
+  `run_desktop.bat` lo invoca antes de iniciar, para no duplicar instancias.
+  Se actualizo `README.md`.
+- Origen: la app seguia activa al cerrar la pestaña y se acumulaban copias del
+  ejecutable en el puerto 7861 (se detectaron dos). La persona usuaria eligio
+  replicar el esquema de scripts de la app del BO CABA.
+- Validacion registrada: copia del script con el puerto 7871; dos instancias
+  de prueba en ese puerto quedaron cerradas y las instancias del puerto 7861
+  no se modificaron. No se ejecuto sobre el puerto 7861 para no cerrar las
+  copias abiertas por la persona usuaria.
+- ADR: no corresponde; no modifica la arquitectura ni los limites entre
+  componentes.
