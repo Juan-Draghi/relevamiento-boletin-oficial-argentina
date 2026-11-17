@@ -20,7 +20,7 @@ La persona usuaria no es desarrolladora de software, pero tiene conocimientos ba
 - `desktop_app/search_core.py`: logica central de descarga o lectura del PDF, extraccion de texto, busqueda por regex y armado de resultados.
 - `desktop_app/keywords.json`: listado base de palabras clave, gestionado mediante el skill `gestionar-keywords-bora-nacional` y no desde la interfaz.
 - `desktop_app/templates/index.html`: interfaz HTML.
-- `desktop_app/static/`: estilos, logo e iconos.
+- `desktop_app/static/`: kit de interfaz CPAU (`cpau-app.css`, copia sin modificar de la skill `cpau-estilo`), estilos propios de la app (`styles.css`), logo, favicon e icono del ejecutable.
 - `desktop_app/requirements.txt`: dependencias de ejecucion.
 - `desktop_app/build_requirements.txt`: dependencias para generar el ejecutable.
 - `CLAUDE.md`: punto de entrada para Claude Code; importa este archivo (`@AGENTS.md`) para mantener una sola fuente de instrucciones.
@@ -71,7 +71,7 @@ Despues, implementa la solucion mas simple, robusta y facil de mantener. No inve
 - Antes de modificar una keyword, verifica duplicados, cobertura por patrones existentes y si una expresion regular esta justificada; valida ejemplos positivos y negativos y registra el cambio en el log.
 - Si se modifica el formato de `keywords.json`, documenta la migracion o manten compatibilidad hacia atras.
 - Si se agregan dependencias, actualiza `desktop_app/requirements.txt` y, si aplica, `desktop_app/build_requirements.txt`.
-- Si se tocan estilos o interfaz, aplica el sistema definido por la skill global `disenar-interfaces-operativas` (instalada en `%USERPROFILE%\.claude\skills\`) y el ADR-0006, preservando los contratos funcionales existentes.
+- Si se tocan estilos o interfaz, aplica la marca Biblioteca CPAU definida por la skill global `cpau-estilo` (instalada en `%USERPROFILE%\.claude\skills\`, guia `references/aplicaciones.md`) y el ADR-0007, preservando los contratos funcionales existentes. No modifiques `cpau-app.css`: los ajustes propios van en `styles.css`. No uses la skill `disenar-interfaces-operativas` en este repositorio.
 - Verifica que el flujo principal siga siendo claro: cargar URL o PDF, ejecutar la busqueda y revisar los resultados. Las keywords no deben quedar expuestas para edicion en la interfaz.
 
 ## Como explicar las soluciones

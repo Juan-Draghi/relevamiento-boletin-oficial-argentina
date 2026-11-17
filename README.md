@@ -131,7 +131,7 @@ documentan como ADR en `docs/adr/`. El indice y los estados estan en
 - `desktop_app/search_core.py`: descarga, lectura de PDF, matching y resultados.
 - `desktop_app/app.py`: Flask, API local, progreso y persistencia.
 - `desktop_app/templates/index.html`: interfaz operativa.
-- `desktop_app/static/`: estilos, logo e icono.
+- `desktop_app/static/`: kit de interfaz CPAU (`cpau-app.css`), estilos propios (`styles.css`), logo, favicon e icono.
 - `.claude/skills/gestionar-keywords-bora-nacional/`: procedimiento auditable de
   mantenimiento de keywords (skill de proyecto de Claude Code).
 - `notebooks/`: prototipo historico de Google Colab.

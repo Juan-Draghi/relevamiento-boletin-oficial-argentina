@@ -17,4 +17,5 @@ Estados utilizados:
 3. [ADR-0003: empaquetado Windows y persistencia](0003-empaquetado-windows-y-persistencia.md)
 4. [ADR-0004: progreso de busqueda asincrono](0004-progreso-de-busqueda-asincrono.md)
 5. [ADR-0005: gestion controlada de keywords](0005-gestion-controlada-de-keywords.md)
-6. [ADR-0006: sistema visual operativo](0006-sistema-visual-operativo.md)
+6. [ADR-0006: sistema visual operativo](0006-sistema-visual-operativo.md) - Reemplazada por ADR-0007
+7. [ADR-0007: marca Biblioteca CPAU en la interfaz](0007-marca-biblioteca-cpau-en-la-interfaz.md)
