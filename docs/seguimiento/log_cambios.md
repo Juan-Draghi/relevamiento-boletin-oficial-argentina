@@ -121,3 +121,60 @@ configuracion del proyecto. Las decisiones de arquitectura se desarrollan en
 - ADR: no corresponde; no modifica la arquitectura de la aplicacion. El
   ADR-0006 se conserva sin cambios: la skill `disenar-interfaces-operativas`
   sigue siendo la referencia, ahora disponible como skill global de Claude Code.
+
+## 2026-11-17 - Interfaz con la marca Biblioteca CPAU
+
+- Tipo: cambio de interfaz y decision de arquitectura.
+- Cambio: la interfaz pasa del sistema visual neutro al kit de la skill
+  `cpau-estilo` con la marca Biblioteca CPAU. Se agregaron
+  `desktop_app/static/cpau-app.css` (copia sin modificar del kit), `logo.png`
+  (logo oficial) y `favicon.ico`; `styles.css` quedo reducido a los
+  componentes propios de la app y `templates/index.html` usa las clases del
+  kit. Los textos de la plantilla incorporan tildes y "keywords" se muestra
+  como "palabras clave". Se conservaron endpoints, IDs y flujo de busqueda.
+  `biblioteca-logo.png` queda sin uso en la carpeta `static`. Se actualizaron
+  `AGENTS.md` y `README.md`.
+- Origen: pedido de la persona usuaria de aplicar el estilo CPAU a la
+  interfaz, con la decision explicita de reemplazar el ADR-0006.
+- Validacion registrada: `python -m compileall desktop_app`; instancia de
+  prueba en el puerto 7871 (el 7861 estaba en uso por otra instancia);
+  Playwright a 1366 y 390 px con busqueda por URL del Boletin Oficial
+  (finalizada, sin coincidencias ese dia) y con un PDF local de prueba (2
+  paginas con coincidencias); cambio de origen URL/archivo; sin desplazamiento
+  horizontal y sin errores de consola. No se regenero el ejecutable.
+- ADR: [ADR-0007](../adr/0007-marca-biblioteca-cpau-en-la-interfaz.md), que
+  reemplaza al [ADR-0006](../adr/0006-sistema-visual-operativo.md).
+
+## 2026-11-17 - Regeneracion del ejecutable con la marca Biblioteca CPAU
+
+- Tipo: empaquetado.
+- Cambio: se regenero `dist\RelevamientoBORA.exe` con PyInstaller 6.19.0 y
+  los mismos parametros de `build_desktop_exe.bat`, para incorporar la
+  interfaz descripta en la entrada anterior. El ejecutable previo se conservo
+  como `dist\RelevamientoBORA_anterior-2026-07-17.exe`.
+- Origen: la persona usuaria seguia viendo la interfaz anterior porque usaba
+  el ejecutable empaquetado en julio, que incluye su propia copia de
+  plantillas y estilos.
+- Validacion registrada: listado del contenido empaquetado (`cpau-app.css`,
+  `logo.png`, `favicon.ico`, `styles.css`, `index.html`) y ejecucion del
+  `.exe` en el puerto 7861 con la interfaz nueva; las keywords sincronizadas
+  en los datos del usuario se siguieron cargando (38).
+- ADR: [ADR-0007](../adr/0007-marca-biblioteca-cpau-en-la-interfaz.md).
+
+## 2026-11-17 - Script para detener la aplicacion local
+
+- Tipo: cambio funcional de ejecucion.
+- Cambio: se agrego `stop_desktop.bat`, que cierra todo proceso que escuche en
+  el puerto 7861 (codigo fuente o `RelevamientoBORA.exe`), con el mismo
+  mecanismo que la app del BO CABA (`netstat` + `taskkill`).
+  `run_desktop.bat` lo invoca antes de iniciar, para no duplicar instancias.
+  Se actualizo `README.md`.
+- Origen: la app seguia activa al cerrar la pestaña y se acumulaban copias del
+  ejecutable en el puerto 7861 (se detectaron dos). La persona usuaria eligio
+  replicar el esquema de scripts de la app del BO CABA.
+- Validacion registrada: copia del script con el puerto 7871; dos instancias
+  de prueba en ese puerto quedaron cerradas y las instancias del puerto 7861
+  no se modificaron. No se ejecuto sobre el puerto 7861 para no cerrar las
+  copias abiertas por la persona usuaria.
+- ADR: no corresponde; no modifica la arquitectura ni los limites entre
+  componentes.

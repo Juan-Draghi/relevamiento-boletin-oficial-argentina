@@ -1,66 +1,60 @@
 <!doctype html>
-<html lang="es">
+<html lang="es-AR">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Biblioteca CPAU | Busqueda de normativa en el Boletin Oficial de la República Argentina</title>
+  <title>Búsqueda de normativa en el Boletín Oficial · Biblioteca CPAU</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='cpau-app.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-  <header class="app-header">
-    <div class="app-header__inner">
-      <a class="brand" href="/" aria-label="Biblioteca CPAU, inicio">
-        <img src="{{ url_for('static', filename='biblioteca-logo.png') }}" alt="Biblioteca CPAU">
-      </a>
-      <div class="app-status">
-        <span class="app-status__dot" aria-hidden="true"></span>
-        Aplicacion local
-      </div>
-    </div>
+<div class="app">
+  <header class="app-barra">
+    <a href="/" aria-label="Biblioteca CPAU, inicio">
+      <img class="app-barra__logo" src="{{ url_for('static', filename='logo.png') }}" alt="Biblioteca CPAU">
+    </a>
+    <div class="app-barra__nombre">Relevamiento del Boletín Oficial<small>Aplicación local</small></div>
   </header>
 
-  <main class="app-shell">
-    <section class="intro" aria-labelledby="page-title">
-      <div class="intro__copy">
-        <p class="section-kicker">Relevamiento BORA</p>
-        <h1 id="page-title">Busqueda de normativa en el Boletin Oficial de la República Argentina</h1>
-        <p class="intro__description">
-          Analisis local de documentos PDF mediante los terminos y patrones
-          definidos por la Biblioteca CPAU.
-        </p>
-      </div>
-      <div class="keyword-summary" aria-label="Configuracion de busqueda activa">
-        <span>Configuracion activa</span>
-        <strong>{{ keywords_count }}</strong>
-        <small>keywords</small>
-      </div>
-    </section>
-
-    <section class="search-panel" aria-labelledby="search-title">
-      <div class="panel-heading">
+  <div class="app-cuerpo">
+    <main class="app-principal" id="contenido">
+      <section class="cabecera" aria-labelledby="page-title">
         <div>
-          <p class="section-kicker">Nueva busqueda</p>
-          <h2 id="search-title">Seleccionar documento</h2>
+          <p class="antetitulo">Relevamiento BORA</p>
+          <h1 class="titulo-pagina" id="page-title">Búsqueda de normativa en el Boletín Oficial de la República Argentina</h1>
+          <p class="descripcion">
+            Análisis local de documentos PDF con los términos y patrones
+            definidos por la Biblioteca CPAU.
+          </p>
         </div>
-      </div>
+        <div class="indicador" aria-label="Configuración de búsqueda activa">
+          <span class="indicador__valor">{{ keywords_count }}</span>
+          <span class="indicador__rotulo">palabras clave</span>
+          <span class="indicador__detalle">Configuración activa</span>
+        </div>
+      </section>
 
-      <form method="post" enctype="multipart/form-data" class="search-form" id="search-form">
-        <fieldset class="source-selector">
-          <legend>Origen del PDF</legend>
-          <div class="segmented-control">
-            <label>
-              <input type="radio" name="source_mode" value="url" checked>
-              <span>URL</span>
-            </label>
-            <label>
-              <input type="radio" name="source_mode" value="file">
-              <span>Archivo local</span>
-            </label>
-          </div>
-        </fieldset>
+      <section class="tarjeta tarjeta--acento" aria-labelledby="search-title">
+        <h2 class="tarjeta__titulo" id="search-title">Seleccionar documento</h2>
+        <p class="tarjeta__ayuda">Indicá la URL del PDF o cargá un archivo guardado en el equipo.</p>
 
-        <div class="source-fields">
-          <div class="field" id="url-source">
+        <form method="post" enctype="multipart/form-data" id="search-form">
+          <fieldset class="campo origen">
+            <legend>Origen del PDF</legend>
+            <div class="segmentos">
+              <label>
+                <input type="radio" name="source_mode" value="url" checked>
+                <span>URL</span>
+              </label>
+              <label>
+                <input type="radio" name="source_mode" value="file">
+                <span>Archivo local</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="campo" id="url-source">
             <label for="url_pdf">URL del PDF</label>
             <input
               id="url_pdf"
@@ -72,53 +66,52 @@
             >
           </div>
 
-          <div class="field" id="file-source" hidden>
+          <div class="campo" id="file-source" hidden>
             <label for="pdf_file">Archivo PDF</label>
             <input id="pdf_file" name="pdf_file" type="file" accept="application/pdf,.pdf" disabled>
           </div>
+
+          <div class="acciones">
+            <button type="submit" class="btn" id="search-submit">Iniciar búsqueda</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="tarjeta" id="progress-panel" role="status" aria-live="polite" hidden>
+        <div class="progreso-encabezado">
+          <div>
+            <p class="antetitulo">Procesamiento</p>
+            <p id="progress-message">Preparando búsqueda...</p>
+          </div>
+          <strong id="progress-percent">0%</strong>
         </div>
-
-        <div class="form-actions">
-          <button type="submit" id="search-submit">Iniciar busqueda</button>
+        <div class="progreso" role="progressbar" aria-label="Progreso de la búsqueda" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="progreso__barra" id="progress-bar-fill"></div>
         </div>
-      </form>
-    </section>
+      </section>
 
-    <section class="progress-panel" id="progress-panel" role="status" aria-live="polite" hidden>
-      <div class="progress-panel__header">
-        <div>
-          <p class="section-kicker">Procesamiento</p>
-          <p class="progress-panel__message" id="progress-message">Preparando busqueda...</p>
+      <section class="aviso aviso--info" id="message-box" role="status" aria-live="polite" hidden>
+        <span id="message-text"></span>
+      </section>
+
+      <section id="results-panel" aria-labelledby="results-title" hidden>
+        <div class="encabezado-seccion">
+          <div>
+            <p class="antetitulo">Resultados</p>
+            <h2 id="results-title">Coincidencias encontradas</h2>
+          </div>
+          <span class="chip chip--info" id="results-count">0 páginas</span>
         </div>
-        <strong id="progress-percent">0%</strong>
-      </div>
-      <div class="progress-bar" role="progressbar" aria-label="Progreso de la busqueda" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-        <div class="progress-bar__fill" id="progress-bar-fill"></div>
-      </div>
-    </section>
+        <div class="registros" id="results-body"></div>
+      </section>
+    </main>
+  </div>
 
-    <section class="message message--info" id="message-box" role="status" aria-live="polite" hidden>
-      <span id="message-text"></span>
-    </section>
-
-    <section class="results" id="results-panel" aria-labelledby="results-title" hidden>
-      <div class="results-header">
-        <div>
-          <p class="section-kicker">Resultados</p>
-          <h2 id="results-title">Coincidencias encontradas</h2>
-        </div>
-        <span class="results-count" id="results-count">0 paginas</span>
-      </div>
-      <div class="results-list" id="results-body"></div>
-    </section>
-  </main>
-
-  <footer class="app-footer">
-    <div class="app-footer__inner">
-      <span>Biblioteca CPAU</span>
-      <span>Relevamiento local del Boletin Oficial</span>
-    </div>
+  <footer class="app-pie">
+    <span>Biblioteca CPAU · Relevamiento del Boletín Oficial</span>
+    <span>Aplicación local</span>
   </footer>
+</div>
 
   <script>
     const searchForm = document.getElementById("search-form");
@@ -161,7 +154,7 @@
     function setMessage(text, kind) {
       messageText.textContent = text;
       messageBox.hidden = false;
-      messageBox.className = `message message--${kind}`;
+      messageBox.className = `aviso aviso--${kind}`;
     }
 
     function updateProgress(job) {
@@ -176,12 +169,12 @@
     function setSearching(isSearching) {
       submitButton.disabled = isSearching;
       submitButton.setAttribute("aria-busy", String(isSearching));
-      submitButton.textContent = isSearching ? "Procesando..." : "Iniciar busqueda";
+      submitButton.textContent = isSearching ? "Procesando..." : "Iniciar búsqueda";
     }
 
     function clearResults() {
       resultsBody.innerHTML = "";
-      resultsCount.textContent = "0 paginas";
+      resultsCount.textContent = "0 páginas";
       resultsPanel.hidden = true;
     }
 
@@ -192,19 +185,18 @@
       }
 
       resultsBody.innerHTML = results.map((result) => `
-        <article class="result-card">
-          <div class="result-card__meta">
-            <span class="page-badge">Pagina ${escapeHtml(result.page_number)}</span>
-            <div class="keyword-group">
-              <span>Keywords detectadas</span>
+        <article class="registro">
+          <div class="registro__meta">
+            <span class="chip chip--neutro">Página ${escapeHtml(result.page_number)}</span>
+            <span class="registro__claves">Palabras clave detectadas:
               <strong>${escapeHtml(result.keyword_label || "")}</strong>
-            </div>
+            </span>
           </div>
-          <p class="result-fragment">${result.fragment_html || ""}</p>
+          <p class="registro__fragmento">${result.fragment_html || ""}</p>
         </article>
       `).join("");
 
-      const pageLabel = results.length === 1 ? "pagina" : "paginas";
+      const pageLabel = results.length === 1 ? "página" : "páginas";
       resultsCount.textContent = `${results.length} ${pageLabel}`;
       resultsPanel.hidden = false;
     }
@@ -214,13 +206,13 @@
         const response = await fetch(`/api/search/${jobId}`);
         const job = await response.json();
         if (!response.ok) {
-          throw new Error(job.message || "No se pudo consultar la busqueda.");
+          throw new Error(job.message || "No se pudo consultar la búsqueda.");
         }
         updateProgress(job);
 
         if (job.status === "completed") {
           renderResults(job.results || []);
-          setMessage(job.message || "Busqueda finalizada.", job.results && job.results.length ? "success" : "info");
+          setMessage(job.message || "Búsqueda finalizada.", job.results && job.results.length ? "ok" : "info");
           progressPanel.hidden = true;
           setSearching(false);
           return;
@@ -228,7 +220,7 @@
 
         if (job.status === "error") {
           clearResults();
-          setMessage(job.message || "La busqueda fallo.", "error");
+          setMessage(job.message || "La búsqueda falló.", "error");
           progressPanel.hidden = true;
           setSearching(false);
           return;
@@ -251,8 +243,8 @@
 
       setSearching(true);
       clearResults();
-      setMessage("Iniciando busqueda...", "info");
-      updateProgress({ progress_percent: 2, message: "Preparando busqueda..." });
+      setMessage("Iniciando búsqueda...", "info");
+      updateProgress({ progress_percent: 2, message: "Preparando búsqueda..." });
 
       try {
         const formData = new FormData(searchForm);
@@ -263,7 +255,7 @@
 
         const payload = await response.json();
         if (!response.ok || !payload.job_id) {
-          throw new Error(payload.message || "No se pudo iniciar la busqueda.");
+          throw new Error(payload.message || "No se pudo iniciar la búsqueda.");
         }
 
         await pollJob(payload.job_id);
@@ -271,7 +263,7 @@
         progressPanel.hidden = true;
         setSearching(false);
         clearResults();
-        setMessage(error.message || "No se pudo iniciar la busqueda.", "error");
+        setMessage(error.message || "No se pudo iniciar la búsqueda.", "error");
       }
     });
   </script>

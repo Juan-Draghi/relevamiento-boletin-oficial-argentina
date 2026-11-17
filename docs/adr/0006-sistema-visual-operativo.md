@@ -1,7 +1,7 @@
 # ADR-0006: Sistema visual operativo
 
 - Fecha: 2026-07-16
-- Estado: Aceptada
+- Estado: Reemplazada por [ADR-0007](0007-marca-biblioteca-cpau-en-la-interfaz.md)
 
 ## Contexto
 

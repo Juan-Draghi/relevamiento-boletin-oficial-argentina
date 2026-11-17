@@ -2,6 +2,9 @@
 setlocal
 cd /d "%~dp0"
 
+rem Cierra cualquier copia previa de la app para no duplicarla en el puerto.
+call "%~dp0stop_desktop.bat"
+
 python desktop_app\app.py
 
 if errorlevel 1 (
