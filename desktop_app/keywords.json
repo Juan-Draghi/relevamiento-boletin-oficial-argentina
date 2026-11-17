@@ -17,7 +17,7 @@
     "instalaciones sanitarias",
     "instalaciones de gas",
     "hipotecas divisibles",
-    "decreto 1017/2024",
+    "[Dd]ecreto(?: (?:N[°º]|n[°º])\\.?)? ?1017(?:/?(?:2024|24))?",
     "unidades funcionales futuras",
     "actividades profesionales reservadas exclusivamente al título",
     "actividades profesionales reservadas al título de arquitecto",

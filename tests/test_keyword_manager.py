@@ -75,5 +75,106 @@ class KeywordManagerTests(unittest.TestCase):
             self.assertIn("ADR-0005", log)
 
 
+def make_repo(root: Path, keywords: list[str]) -> Path:
+    """Create a minimal BORA repository layout for the keyword manager."""
+    (root / "desktop_app").mkdir()
+    (root / "docs/seguimiento").mkdir(parents=True)
+    (root / "docs/adr").mkdir(parents=True)
+    (root / "desktop_app/keywords.json").write_text(
+        json.dumps({"keywords": keywords}), encoding="utf-8"
+    )
+    (root / "desktop_app/search_core.py").write_text("", encoding="utf-8")
+    (root / "docs/seguimiento/log_cambios.md").write_text("# Log de cambios\n", encoding="utf-8")
+    (root / "docs/adr/0005-gestion-controlada-de-keywords.md").write_text("# ADR-0005\n", encoding="utf-8")
+    return root
+
+
+def read_state(repo: Path) -> tuple[list[str], str]:
+    data = json.loads((repo / "desktop_app/keywords.json").read_text(encoding="utf-8"))
+    log = (repo / "docs/seguimiento/log_cambios.md").read_text(encoding="utf-8")
+    return data["keywords"], log
+
+
+class ReplaceAndRemoveTests(unittest.TestCase):
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp_dir.cleanup)
+        self.repo = make_repo(
+            Path(self.temp_dir.name),
+            ["arquitectura", "centro de trasnformación", "construcción", "obra pública"],
+        )
+
+    def change_args(self, **kwargs):
+        defaults = dict(
+            repo=str(self.repo),
+            reason="Motivo de prueba.",
+            evidence="Caso de prueba.",
+            positive=[],
+            negative=[],
+            entry_date="2026-11-17",
+        )
+        defaults.update(kwargs)
+        return argparse.Namespace(**defaults)
+
+    def test_replace_keeps_position_and_logs_both_values(self):
+        MANAGE_KEYWORD.replace_keyword(self.change_args(
+            current="centro de trasnformación",
+            value="centros? de transformación",
+            positive=["Instalacion de centro de transformación"],
+            negative=["Centro de salud"],
+        ))
+        keywords, log = read_state(self.repo)
+        self.assertEqual(keywords[1], "centros? de transformación")
+        self.assertEqual(len(keywords), 4)
+        self.assertIn("se reemplazo `centro de trasnformación`", log)
+
+    def test_replace_rejects_value_covered_by_another_keyword(self):
+        with self.assertRaises(MANAGE_KEYWORD.KeywordManagerError):
+            MANAGE_KEYWORD.replace_keyword(self.change_args(
+                current="centro de trasnformación",
+                value="Construccion",
+                positive=["construccion"],
+                negative=["transito"],
+            ))
+        keywords, log = read_state(self.repo)
+        self.assertIn("centro de trasnformación", keywords)
+        self.assertNotIn("Ajuste de keywords", log)
+
+    def test_replace_requires_existing_exact_value(self):
+        with self.assertRaises(MANAGE_KEYWORD.KeywordManagerError):
+            MANAGE_KEYWORD.replace_keyword(self.change_args(
+                current="inexistente", value="otro", positive=["otro"], negative=["x"],
+            ))
+
+    def test_remove_deletes_value_and_logs(self):
+        MANAGE_KEYWORD.remove_keyword(self.change_args(
+            value="construcción",
+            negative=["Ley de construcción de caminos"],
+        ))
+        keywords, log = read_state(self.repo)
+        self.assertNotIn("construcción", keywords)
+        self.assertIn("se elimino `construcción`", log)
+
+    def test_remove_fails_if_negative_still_detected_by_other_keyword(self):
+        with self.assertRaises(MANAGE_KEYWORD.KeywordManagerError):
+            MANAGE_KEYWORD.remove_keyword(self.change_args(
+                value="construcción",
+                negative=["construcción de obra pública"],
+            ))
+        keywords, _ = read_state(self.repo)
+        self.assertIn("construcción", keywords)
+
+    def test_remove_fails_if_positive_loses_coverage(self):
+        with self.assertRaises(MANAGE_KEYWORD.KeywordManagerError):
+            MANAGE_KEYWORD.remove_keyword(self.change_args(
+                value="construcción",
+                positive=["Codigo de construcción"],
+            ))
+
+    def test_remove_requires_some_example(self):
+        with self.assertRaises(MANAGE_KEYWORD.KeywordManagerError):
+            MANAGE_KEYWORD.remove_keyword(self.change_args(value="construcción"))
+
+
 if __name__ == "__main__":
     unittest.main()

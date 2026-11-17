@@ -46,43 +46,69 @@ SEARCH_JOBS: dict[str, dict[str, object]] = {}
 SEARCH_JOBS_LOCK = threading.Lock()
 
 
-def write_keywords_file(keywords: list[str]) -> None:
-    KEYWORDS_FILE.parent.mkdir(parents=True, exist_ok=True)
-    KEYWORDS_FILE.write_text(
+def get_build_keywords_file() -> Path:
+    """Lista de keywords que trajo el ultimo build sincronizado (ver ADR-0008)."""
+    return KEYWORDS_FILE.with_name("keywords_build.json")
+
+
+def write_keywords_file(keywords: list[str], path: Path | None = None) -> None:
+    target = path or KEYWORDS_FILE
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
         json.dumps({"keywords": keywords}, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
 
 
-def merge_keywords(existing_keywords: list[str], default_keywords: list[str]) -> list[str]:
-    """Preserve user terms and append new keywords bundled with the app."""
-    merged = list(existing_keywords)
-    seen = {keyword.strip().casefold() for keyword in existing_keywords}
+def sync_keywords(
+    user_keywords: list[str],
+    bundled_keywords: list[str],
+    previous_bundled_keywords: list[str] | None,
+) -> list[str]:
+    """Rebuild the user copy from the current build, keeping personal terms.
 
-    for keyword in default_keywords:
-        normalized = keyword.strip().casefold()
-        if normalized not in seen:
-            merged.append(keyword)
+    A personal term is one that appears in the user copy but in neither the
+    previous build nor the current one. Values present in the previous build
+    and missing from the current one were removed or replaced through the
+    keywords skill, so they are dropped. Without a previous build record
+    (first run of this version), every extra term is kept as personal.
+    """
+    if previous_bundled_keywords is None:
+        previous_bundled_keywords = bundled_keywords
+
+    def normalize(keyword: str) -> str:
+        return keyword.strip().casefold()
+
+    known = {normalize(keyword) for keyword in previous_bundled_keywords + bundled_keywords}
+    synced = list(bundled_keywords)
+    seen = {normalize(keyword) for keyword in bundled_keywords}
+
+    for keyword in user_keywords:
+        normalized = normalize(keyword)
+        if normalized not in known and normalized not in seen:
+            synced.append(keyword)
             seen.add(normalized)
 
-    return merged
+    return synced
 
 
 def ensure_keywords_file() -> list[str]:
-    default_keywords = load_keywords(DEFAULT_KEYWORDS_FILE)
+    bundled_keywords = load_keywords(DEFAULT_KEYWORDS_FILE)
 
+    # Desde codigo fuente se usa directamente el archivo versionado.
     if KEYWORDS_FILE.resolve() == DEFAULT_KEYWORDS_FILE.resolve():
-        return default_keywords
+        return bundled_keywords
 
-    if not KEYWORDS_FILE.exists():
-        write_keywords_file(default_keywords)
-        return default_keywords
+    build_file = get_build_keywords_file()
+    previous_bundled = load_keywords(build_file) if build_file.exists() else None
+    user_keywords = load_keywords(KEYWORDS_FILE) if KEYWORDS_FILE.exists() else []
 
-    existing_keywords = load_keywords(KEYWORDS_FILE)
-    merged_keywords = merge_keywords(existing_keywords, default_keywords)
-    if merged_keywords != existing_keywords:
-        write_keywords_file(merged_keywords)
-    return merged_keywords
+    synced_keywords = sync_keywords(user_keywords, bundled_keywords, previous_bundled)
+    if synced_keywords != user_keywords or not KEYWORDS_FILE.exists():
+        write_keywords_file(synced_keywords)
+    if previous_bundled != bundled_keywords:
+        write_keywords_file(bundled_keywords, build_file)
+    return synced_keywords
 
 
 def set_job_state(job_id: str, **updates: object) -> None:

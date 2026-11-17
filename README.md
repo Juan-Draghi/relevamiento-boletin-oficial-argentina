@@ -66,17 +66,24 @@ La interfaz no permite editar keywords. La fuente versionada es
 `desktop_app/keywords.json` y los cambios deben realizarse con el skill
 `gestionar-keywords-bora-nacional`.
 
-Ejemplo de invocacion:
+Ejemplos de invocacion en Claude Code:
 
 ```text
-Use $gestionar-keywords-bora-nacional para evaluar y agregar la keyword "termino" al BORA nacional.
+/gestionar-keywords-bora-nacional agregar la keyword "termino"
+/gestionar-keywords-bora-nacional modificar "centro de trasnformación" para corregir la errata
+/gestionar-keywords-bora-nacional eliminar "construcción" porque genera falsos positivos
 ```
 
-El skill:
+El skill admite altas, modificaciones y bajas. Como la aplicacion no guarda
+resultados, no compara contra busquedas anteriores: la evidencia son los
+ejemplos aportados. El skill:
 
+- lista las keywords actuales y ubica el valor exacto a modificar o eliminar;
 - verifica duplicados y cobertura por patrones existentes;
 - determina si corresponde usar un literal o un regex acotado;
-- exige casos positivos y negativos;
+- exige casos positivos y negativos (en una baja, comprueba que se deja de
+  detectar o que se sigue detectando por otras keywords);
+- pide aprobacion del cambio exacto antes de editar;
 - valida el JSON y el patron;
 - registra el cambio en `docs/seguimiento/log_cambios.md`.
 
@@ -89,14 +96,26 @@ Cuando la aplicacion corre empaquetada, conserva las keywords del usuario en:
 %LOCALAPPDATA%\BibliotecaCPAU\RelevamientoBORA\keywords.json
 ```
 
-Al iniciar un build nuevo, agrega al archivo persistente las keywords
-versionadas que aun no existan, sin borrar terminos personalizados anteriores.
+Al iniciar, reconstruye ese archivo con las keywords del build y conserva los
+terminos personales (los que no vinieron en ningun build). Guarda la lista del
+build en `keywords_build.json`, en la misma carpeta, para detectar en el build
+siguiente que valores se eliminaron o reemplazaron. Asi, las altas, bajas y
+modificaciones hechas con el skill llegan al ejecutable al regenerarlo.
 
 ## Generar el ejecutable
 
-1. Cerrar todas las instancias de `RelevamientoBORA.exe` con `stop_desktop.bat`.
-2. Ejecutar `build_desktop_exe.bat`.
-3. Usar el archivo generado en `dist/RelevamientoBORA.exe`.
+Ejecutar `build_desktop_exe.bat`. El script:
+
+1. cierra la aplicacion si esta abierta (llama a `stop_desktop.bat`), porque
+   un `.exe` en uso no se puede reemplazar;
+2. quita la marca de solo lectura que OneDrive puede poner en
+   `build\RelevamientoBORA\localpycs` y que impide a PyInstaller limpiar la
+   compilacion anterior (no borra nada);
+3. genera `dist/RelevamientoBORA.exe`;
+4. si el build termina bien, abre la aplicacion nueva.
+
+Si algo falla, la ventana queda abierta con el mensaje de error. El proceso
+completo tarda varios minutos.
 
 El build usa PyInstaller en modo `--onefile --windowed`.
 

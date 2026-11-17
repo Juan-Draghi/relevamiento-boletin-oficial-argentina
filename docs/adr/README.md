@@ -14,8 +14,9 @@ Estados utilizados:
 
 1. [ADR-0001: aplicacion local como version activa](0001-aplicacion-local-como-version-activa.md)
 2. [ADR-0002: separacion entre interfaz y nucleo de busqueda](0002-separacion-interfaz-y-nucleo-de-busqueda.md)
-3. [ADR-0003: empaquetado Windows y persistencia](0003-empaquetado-windows-y-persistencia.md)
+3. [ADR-0003: empaquetado Windows y persistencia](0003-empaquetado-windows-y-persistencia.md) - Modificada por ADR-0008
 4. [ADR-0004: progreso de busqueda asincrono](0004-progreso-de-busqueda-asincrono.md)
 5. [ADR-0005: gestion controlada de keywords](0005-gestion-controlada-de-keywords.md)
 6. [ADR-0006: sistema visual operativo](0006-sistema-visual-operativo.md) - Reemplazada por ADR-0007
 7. [ADR-0007: marca Biblioteca CPAU en la interfaz](0007-marca-biblioteca-cpau-en-la-interfaz.md)
+8. [ADR-0008: sincronizacion de keywords del ejecutable](0008-sincronizacion-de-keywords-del-ejecutable.md)

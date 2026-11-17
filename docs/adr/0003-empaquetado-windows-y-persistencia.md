@@ -2,7 +2,8 @@
 
 - Fecha: 2026-04-21
 - Actualizada: 2026-07-16
-- Estado: Aceptada
+- Estado: Aceptada; la incorporacion de keywords al archivo persistente fue
+  modificada por [ADR-0008](0008-sincronizacion-de-keywords-del-ejecutable.md).
 
 ## Contexto
 

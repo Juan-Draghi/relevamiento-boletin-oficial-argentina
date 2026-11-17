@@ -192,3 +192,69 @@ configuracion del proyecto. Las decisiones de arquitectura se desarrollan en
   de resguardo `dist\RelevamientoBORA_anterior-2026-07-17.exe`, no versionada,
   se envio a la Papelera de reciclaje.
 - ADR: no corresponde.
+
+## 2026-11-17 - Altas, modificaciones y bajas en el skill de keywords
+
+- Tipo: cambio de procedimiento y herramienta de mantenimiento.
+- Cambio: el skill `gestionar-keywords-bora-nacional` paso de admitir solo
+  altas a admitir altas, modificaciones y bajas. `manage_keyword.py` suma los
+  subcomandos `list` (ubicar el valor exacto), `replace` (reemplazo en la
+  misma posicion, con control de duplicados contra el resto de la lista) y
+  `remove` (verifica que los ejemplos negativos dejen de detectarse y que los
+  positivos sigan detectandose por otras keywords). `SKILL.md` incorpora una
+  ficha de cambio con aprobacion explicita del valor exacto, segun el modelo
+  del skill del BO CABA pero sin comparacion contra registros historicos, ya
+  que esta aplicacion no los guarda. Se actualizaron `README.md` y
+  `agents/openai.yaml`.
+- Origen: pedido de la persona usuaria.
+- Validacion registrada: `python -m unittest discover -s tests` (7 pruebas
+  nuevas para reemplazo, baja y rechazos); `list` y un `remove` con valor
+  inexistente ejecutados sobre el repo sin modificar
+  `desktop_app/keywords.json`.
+- ADR: no corresponde; amplia el procedimiento previsto en ADR-0005.
+
+## 2026-11-17 - Sincronizacion de bajas y reemplazos en el ejecutable
+
+- Tipo: cambio tecnico de persistencia.
+- Cambio: `desktop_app/app.py` reemplaza `merge_keywords` por
+  `sync_keywords`. Al iniciar el ejecutable, la copia de
+  `%LOCALAPPDATA%\BibliotecaCPAU\RelevamientoBORA\keywords.json` se
+  reconstruye con las keywords del build mas los terminos personales, y la
+  lista del build se guarda en `keywords_build.json`. Asi, las bajas y
+  reemplazos hechos con el skill llegan al ejecutable al regenerarlo. Se
+  actualizaron `SKILL.md`, `README.md` y ADR-0003.
+- Origen: al ampliar el skill a bajas y modificaciones se detecto que el
+  ejecutable solo agregaba keywords nuevas a su copia. La persona usuaria
+  pidio aplicar la mejora en la app.
+- Validacion registrada: `python -m unittest discover -s tests` (3 pruebas
+  nuevas: primer arranque, baja/reemplazo con termino personal y escritura de
+  ambos archivos con rutas temporales); comparacion de solo lectura de la
+  copia real con el repositorio (38 frente a 37; el termino propio es un
+  patron para el Decreto 1017, que se conservaria).
+- ADR: [ADR-0008](../adr/0008-sincronizacion-de-keywords-del-ejecutable.md).
+
+## 2026-11-17 - Ajuste de keywords BORA nacional
+
+- Tipo: configuracion de busqueda.
+- Cambio: se reemplazo `decreto 1017/2024` por `[Dd]ecreto(?: (?:N[°º]|n[°º])\.?)? ?1017(?:/?(?:2024|24))?` en `desktop_app/keywords.json` (posicion 18).
+- Motivo: Incorporar al repositorio el patron del Decreto 1017/2024 que solo existia en la copia del ejecutable, para cubrir citas con N°/Nº y ano completo o abreviado, con el mismo formato que los demas decretos de la lista.
+- Evidencia: Patron presente como termino personal en la copia del ejecutable (%LOCALAPPDATA%); identificacion de la norma aportada por la persona usuaria. Riesgo aceptado: tambien detecta 'Decreto 1017/2023' y 'Decreto 10170/2024', como los demas decretos de la lista.
+- Validacion: 5 caso(s) positivo(s) y 2 caso(s) negativo(s) superados con el valor nuevo; regex compilado.
+- ADR: no corresponde; se aplica ADR-0005.
+
+## 2026-11-17 - Build que cierra y reabre la aplicacion
+
+- Tipo: cambio funcional de empaquetado.
+- Cambio: `build_desktop_exe.bat` ahora llama a `stop_desktop.bat` antes de
+  compilar, quita la marca de solo lectura de
+  `build\RelevamientoBORA\localpycs` si existe y, al terminar bien, abre
+  `dist\RelevamientoBORA.exe` y cierra la ventana sin pausa. Ante un error
+  conserva la pausa con el mensaje. Se actualizo `README.md`.
+- Origen: el build fallo con `PermissionError` porque OneDrive dejo esa
+  carpeta temporal como solo lectura, y el `.exe` abierto impedia
+  reemplazarlo. La persona usuaria pidio evitar cerrar y abrir la app a mano
+  en cada regeneracion.
+- Validacion registrada: ejecucion completa del `.bat` con la app abierta: la
+  cerro, genero el ejecutable (09:37:49) y lo abrio (09:37:53), con una sola
+  instancia escuchando en el puerto 7861.
+- ADR: no corresponde; no modifica la arquitectura ni ADR-0003.
