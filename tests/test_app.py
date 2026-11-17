@@ -1,6 +1,11 @@
+import json
+import tempfile
 import unittest
+from pathlib import Path
+from unittest import mock
 
-from desktop_app.app import app, merge_keywords
+from desktop_app import app as app_module
+from desktop_app.app import app, sync_keywords
 
 
 class DesktopAppTests(unittest.TestCase):
@@ -25,15 +30,50 @@ class DesktopAppTests(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 405)
 
-    def test_merge_keywords_preserves_user_order_and_adds_defaults(self):
-        existing = ["termino personalizado", "arquitectura"]
-        defaults = ["arquitectura", "construccion"]
+    def test_sync_first_run_keeps_personal_terms_and_adds_defaults(self):
+        user = ["termino personalizado", "arquitectura"]
+        bundled = ["arquitectura", "construccion"]
 
         self.assertEqual(
-            merge_keywords(existing, defaults),
-            ["termino personalizado", "arquitectura", "construccion"],
+            sync_keywords(user, bundled, None),
+            ["arquitectura", "construccion", "termino personalizado"],
         )
 
+    def test_sync_drops_removed_and_replaced_bundled_terms(self):
+        previous = ["arquitectura", "centro de trasnformacion", "construccion"]
+        bundled = ["arquitectura", "centros? de transformacion"]
+        user = ["arquitectura", "centro de trasnformacion", "construccion", "termino propio"]
+
+        self.assertEqual(
+            sync_keywords(user, bundled, previous),
+            ["arquitectura", "centros? de transformacion", "termino propio"],
+        )
+
+    def test_ensure_keywords_file_writes_copy_and_build_record(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            bundled_file = root / "bundle" / "keywords.json"
+            user_file = root / "user" / "keywords.json"
+            bundled_file.parent.mkdir()
+            user_file.parent.mkdir()
+            bundled_file.write_text(json.dumps({"keywords": ["arquitectura"]}), encoding="utf-8")
+            user_file.write_text(
+                json.dumps({"keywords": ["arquitectura", "construccion", "propio"]}),
+                encoding="utf-8",
+            )
+            build_file = user_file.with_name("keywords_build.json")
+            build_file.write_text(
+                json.dumps({"keywords": ["arquitectura", "construccion"]}), encoding="utf-8"
+            )
+
+            with mock.patch.object(app_module, "DEFAULT_KEYWORDS_FILE", bundled_file),                     mock.patch.object(app_module, "KEYWORDS_FILE", user_file):
+                result = app_module.ensure_keywords_file()
+
+            self.assertEqual(result, ["arquitectura", "propio"])
+            saved = json.loads(user_file.read_text(encoding="utf-8"))["keywords"]
+            build = json.loads(build_file.read_text(encoding="utf-8"))["keywords"]
+            self.assertEqual(saved, ["arquitectura", "propio"])
+            self.assertEqual(build, ["arquitectura"])
 
 if __name__ == "__main__":
     unittest.main()
