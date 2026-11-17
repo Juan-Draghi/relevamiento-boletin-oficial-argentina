@@ -178,3 +178,17 @@ configuracion del proyecto. Las decisiones de arquitectura se desarrollan en
   copias abiertas por la persona usuaria.
 - ADR: no corresponde; no modifica la arquitectura ni los limites entre
   componentes.
+
+## 2026-11-17 - Eliminacion del logo sin uso
+
+- Tipo: limpieza de recursos.
+- Cambio: se elimino `desktop_app/static/biblioteca-logo.png`, que quedo sin
+  referencias al adoptar el logo oficial `logo.png` del kit CPAU.
+- Origen: pedido de la persona usuaria.
+- Validacion registrada: busqueda de referencias a `biblioteca-logo` en el
+  codigo, plantillas, scripts y documentacion vigente (solo la mencionan
+  entradas historicas del log); `python -m compileall desktop_app`. El
+  ejecutable actual todavia lo incluye; se quita en el proximo build. La copia
+  de resguardo `dist\RelevamientoBORA_anterior-2026-07-17.exe`, no versionada,
+  se envio a la Papelera de reciclaje.
+- ADR: no corresponde.
