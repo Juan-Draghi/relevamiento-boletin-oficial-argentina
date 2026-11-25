@@ -258,3 +258,21 @@ configuracion del proyecto. Las decisiones de arquitectura se desarrollan en
   cerro, genero el ejecutable (09:37:49) y lo abrio (09:37:53), con una sola
   instancia escuchando en el puerto 7861.
 - ADR: no corresponde; no modifica la arquitectura ni ADR-0003.
+
+## 2026-11-25 - Ajuste de keywords BORA nacional
+
+- Tipo: configuracion de busqueda.
+- Cambio: se agrego `NAG[- –]?201(?!\d)` a `desktop_app/keywords.json`.
+- Motivo: Incorporar la norma tecnica NAG-201 pedida por la persona usuaria, cubriendo variantes de separador (guion, espacio, sin separador, guion largo) que aparecen al extraer texto de PDFs.
+- Evidencia: Pedido de la persona usuaria; ejemplo representativo 'Apruébase la Norma NAG-201' (sin ejemplar real del Boletin Oficial). Se uso (?!\d) para no detectar NAG-2010.
+- Validacion: 5 caso(s) positivo(s) y 2 caso(s) negativo(s) superados; regex compilado.
+- ADR: no corresponde; se aplica ADR-0005.
+
+## 2026-11-25 - Ajuste de keywords BORA nacional
+
+- Tipo: configuracion de busqueda.
+- Cambio: se agrego `NAG[- –]?200(?!\d)` a `desktop_app/keywords.json`.
+- Motivo: Incorporar la norma nacional NAG-200 (disposiciones y normas minimas para la ejecucion de instalaciones domiciliarias de gas, GN-GL), complementaria de NAG-201 (instalaciones industriales de gas; version 2026, ya cubierta por su keyword). Mismo patron que NAG-201 para cubrir variantes de separador.
+- Evidencia: Pedido y descripcion de la norma aportados por la persona usuaria; ejemplo representativo 'Norma NAG-200 (GN-GL)' (sin ejemplar real del Boletin Oficial). Se uso (?!\d) para no detectar NAG-2000.
+- Validacion: 4 caso(s) positivo(s) y 2 caso(s) negativo(s) superados; regex compilado.
+- ADR: no corresponde; se aplica ADR-0005.
